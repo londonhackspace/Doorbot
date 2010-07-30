@@ -1,2 +1,3 @@
 #!/bin/bash
-python doorbot.py -r0
+
+while true; do python doorbot.py -r0; sleep 5; done

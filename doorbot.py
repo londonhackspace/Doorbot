@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import sys, os, time, re, socket, serial, urllib2
+from datetime import datetime
 
 cardFile = 'cardtable.dat'
 
@@ -12,6 +13,7 @@ try:
 except:
     os._exit(True)
 
+ser = serial.Serial("/dev/ttyUSB0", 9600)
 
 def reloadCardTable(cards):
     global mTime
@@ -28,7 +30,10 @@ def reloadCardTable(cards):
         for line in file:
             if regex.match(line):
                 matches = regex.findall(line)
-                cards[matches[0][0]] = matches[0][1]
+                id, name = matches[0]
+                cards[id] = name
+
+        print 'Loaded card table'
 
     return cards
 
@@ -37,7 +42,6 @@ mTime = 0
 cards = {}
 currentCard = ''
 
-ser = serial.Serial("/dev/ttyUSB0", 19200)
 
 while (True):
     if card.select():
@@ -46,15 +50,30 @@ while (True):
             cards = reloadCardTable(cards)
 
             if currentCard in cards:
+                print '%s: authorised %s as %s' % \
+                        (datetime.now(), currentCard, cards[currentCard])
+
                 ser.write("1");
 
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(('babbage.lan', 12345))
-                s.send("%s opened the hackspace door." % cards[card.uid])
-                s.close()
+                try:
+                    print 'Logging to irccat on babbage'
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.connect(('172.31.24.101', 12345))
+                    s.send("%s opened the hackspace door." % cards[card.uid])
+                    s.close()
+                except Exception:
+                    pass
 
-                urllib2.urlopen('http://babbage.lan:8000/_/255,255,255?restoreAfter=10')
+                try:
+                    print 'Turning on lights'
+                    urllib2.urlopen('http://172.31.24.101:8000/_/255,255,255?restoreAfter=10')
+                except Exception:
+                    pass
 
+                print 'Entrance complete'
+
+            else:
+                print '%s: %s not authorised' % (datetime.now(), currentCard)
     else:
         currentCard = ''
 
