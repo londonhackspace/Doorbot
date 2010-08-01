@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+# Add a tag, based on:
 
 #  isotype.py - determine ISO tag type
 # 
@@ -44,6 +44,9 @@ def addCard(id, name):
 
 def readCardTable():
 
+  os.system('scp flowers@flowers.lan:~/doorbot/cardtable.dat cardtable.dat')
+
+  # Two space separated fields, # for comments
   regex = re.compile("^([^#\n ]+) ([^#\n ]+)$")
 
   file = open(cardFile)
