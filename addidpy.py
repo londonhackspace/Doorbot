@@ -40,11 +40,11 @@ def addCard(id, name):
   file.write('%s %s\n' % (id, name))
   file.close()
 
-  os.system('scp cardtable.dat flowers@flowers.lan:~/doorbot/cardtable.dat')
+  os.system('scp cardtable.dat root@172.31.24.197:~/Doorbot/cardtable.dat')
 
 def readCardTable():
 
-  os.system('scp flowers@flowers.lan:~/doorbot/cardtable.dat cardtable.dat')
+  os.system('scp root@172.31.24.197:~/Doorbot/cardtable.dat cardtable.dat')
 
   # Two space separated fields, # for comments
   regex = re.compile("^([^#\n ]+) ([^#\n ]+)$")
