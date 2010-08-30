@@ -1,0 +1,15 @@
+#!/bin/bash
+
+DIR=/tmp/rootfswd
+
+mkdir $DIR
+# ldd `which nc`
+cp /bin/nc /lib/libc.so.6 /lib/ld-linux.so.2 $DIR
+
+while true; do
+  /bin/true || {
+    echo Rootfs has gone away | $DIR/ld-linux.so.2 --library-path $DIR $DIR/nc -q1 172.31.24.101 12345
+    echo b>/proc/sysrq-trigger
+  }
+  sleep 5
+done
