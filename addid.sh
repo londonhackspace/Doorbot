@@ -1,2 +1,2 @@
 #!/bin/bash
-python addidpy.py -r 0
+python addidpy.py -r0

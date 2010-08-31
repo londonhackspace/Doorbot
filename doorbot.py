@@ -13,7 +13,6 @@ try:
 except:
     os._exit(True)
 
-ser = serial.Serial("/dev/ttyUSB0", 9600)
 
 def reloadCardTable(cards):
     global mTime
@@ -42,6 +41,7 @@ mTime = 0
 cards = {}
 currentCard = ''
 
+print 'This is doorbot'
 
 while (True):
     if card.select():
@@ -53,7 +53,9 @@ while (True):
                 print '%s: authorised %s as %s' % \
                         (datetime.now(), currentCard, cards[currentCard])
 
+                ser = serial.Serial("/dev/ttyUSB0", 9600)
                 ser.write("1");
+                ser.close();
 
                 try:
                     print 'Logging to irccat on babbage'
@@ -67,6 +69,12 @@ while (True):
                 try:
                     print 'Turning on lights'
                     urllib2.urlopen('http://172.31.24.101:8000/_/255,255,255?restoreAfter=10')
+                except Exception:
+                    pass
+
+                try:
+                    print 'Displaying on board'
+                    urllib2.urlopen('http://172.31.24.101:8020/%s%20just%20opened%20the%20door' % cards[card.uid])
                 except Exception:
                     pass
 
