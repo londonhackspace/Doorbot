@@ -83,7 +83,7 @@ while True:
     addCard(id, name)
     print 'Card %s is now authorised to %s\n' % (id, name)
 
-    os._exit(0)
+  os._exit(0)
 
 os._exit(0)
 
