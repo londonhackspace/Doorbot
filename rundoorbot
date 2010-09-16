@@ -10,7 +10,7 @@ else
   while true; do
     ./doorbot.py -r0
     echo Doorbot exited. Restarting shortly...
-    echo Doorbot exited. Restarting... |nc -q1 172.31.24.101 12345
+    echo Restarting doorbot |nc -q1 172.31.24.101 12345
     sleep 5
   done
 fi

@@ -36,12 +36,18 @@ def reloadCardTable(cards):
 
     return cards
 
+def ircsay(msg):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('172.31.24.101', 12345))
+    s.send(msg)
+    s.close()
 
 mTime = 0
 cards = {}
 currentCard = ''
 
 print 'This is doorbot'
+ircsay('This is doorbot')
 
 while (True):
     if card.select():
@@ -59,10 +65,7 @@ while (True):
 
                 try:
                     print 'Logging to irccat on babbage'
-                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.connect(('172.31.24.101', 12345))
-                    s.send("%s opened the hackspace door." % cards[card.uid])
-                    s.close()
+                    ircsay("%s opened the hackspace door." % cards[card.uid])
                 except Exception:
                     pass
 
@@ -74,7 +77,7 @@ while (True):
 
                 try:
                     print 'Displaying on board'
-                    urllib2.urlopen('http://172.31.24.101:8020/%s%20just%20opened%20the%20door' % cards[card.uid])
+                    urllib2.urlopen('http://172.31.24.101:8020/%s%%20just%%20opened%%20the%%20door' % cards[card.uid])
                 except Exception:
                     pass
 
