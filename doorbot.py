@@ -77,7 +77,8 @@ while (True):
 
                 try:
                     print 'Displaying on board'
-                    urllib2.urlopen('http://172.31.24.101:8020/%s%%20just%%20opened%%20the%%20door' % cards[card.uid])
+                    #import pdb;pdb.set_trace()
+                    urllib2.urlopen('http://172.31.24.101:8020/%s%%20just%%20opened%%20the%%20door?restoreAfter=10' % cards[card.uid])
                 except Exception:
                     pass
 
