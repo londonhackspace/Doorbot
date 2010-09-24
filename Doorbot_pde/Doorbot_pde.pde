@@ -1,9 +1,9 @@
-int triggerPin = 9;
+int triggerPin = 13;
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(9, OUTPUT);   // digital sensor is on digital pin 2
+  pinMode(triggerPin, OUTPUT);
 }
 
 void loop()
