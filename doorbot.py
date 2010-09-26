@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys, os, time, re, socket, serial, urllib2
+import sys, os, time, re, socket, serial, urllib2, random
 from datetime import datetime
 
 cardFile = 'cardtable.dat'
@@ -47,7 +47,17 @@ cards = {}
 currentCard = ''
 
 print 'This is doorbot'
-ircsay('This is doorbot')
+
+#ircsay('This is doorbot')
+welcomes = [
+  'This is doorbot and welcome to you who have come to doorbot',
+  'Anything is possible with doorbot',
+  'The infinite is possible with doorbot',
+  'The unattainable is unknown with doorbot',
+  'You can do anything with doorbot',
+]
+welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
+ircsay(random.choice(welcomes))
 
 while (True):
     if card.select():
