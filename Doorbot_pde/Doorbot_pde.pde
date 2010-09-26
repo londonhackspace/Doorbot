@@ -5,10 +5,12 @@ void setup()
 {
   Serial.begin(9600);
   pinMode(triggerPin, OUTPUT);
+/*
   pinMode(doorBellButton, INPUT);
   pinMode(doorBellLEDGreen, OUTPUT);
   pinMode(doorBellLEDRed, OUTPUT);
   digitalWrite(doorBellButton, HIGH);
+*/
 }
 
 void loop()
@@ -28,6 +30,7 @@ void loop()
       delay(500); // Pause to ensure it resets
     }
   }
+/*
   // Check door bell button
   if(digitalRead(doorBellButton)){
     digitalWrite(doorBellLEDGreen, LOW);
@@ -36,5 +39,6 @@ void loop()
   else{
     digitalWrite(doorBellLEDRed, LOW);
     digitalWrite(doorBellLEDGreen, HIGH);
-  }  
+  }
+*/
 }
