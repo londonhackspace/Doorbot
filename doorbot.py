@@ -2,20 +2,45 @@
 import sys, os, time, re, socket, serial, urllib2, random
 from datetime import datetime
 
-cardFile = 'cardtable.dat'
-
-# We're binding against the local copy for stability
-sys.path.append('RFIDIOt-0.1x')
+sys.path.append('RFIDIOt-0.1x') # use local copy for stability
 import RFIDIOtconfig
 
-try:
-    card = RFIDIOtconfig.card
-except:
-    os._exit(True)
+
+cardFile = 'cardtable.dat'
+
+mTime = 0
+cards = {}
+currentCard = ''
 
 
-def reloadCardTable(cards):
+def ircsay(msg):
+    return
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('172.31.24.101', 12345))
+    s.send(msg)
+    s.close()
+
+
+def welcome():
+
+    print 'This is doorbot'
+
+    #ircsay('This is doorbot')
+    welcomes = [
+        'This is doorbot and welcome to you who have come to doorbot',
+        'Anything is possible with doorbot',
+        'The infinite is possible with doorbot',
+        'The unattainable is unknown with doorbot',
+        'You can do anything with doorbot',
+    ]
+    welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
+    ircsay(random.choice(welcomes))
+
+
+def reloadCardTable():
     global mTime
+    global cards
+
     currentMtime = os.path.getmtime(cardFile)
 
     if mTime != currentMtime:
@@ -34,69 +59,81 @@ def reloadCardTable(cards):
 
         print 'Loaded card table'
 
-    return cards
 
-def ircsay(msg):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('172.31.24.101', 12345))
-    s.send(msg)
-    s.close()
+def checkForCard(card, ser):
 
-mTime = 0
-cards = {}
-currentCard = ''
+    global currentCard
 
-print 'This is doorbot'
-
-#ircsay('This is doorbot')
-welcomes = [
-  'This is doorbot and welcome to you who have come to doorbot',
-  'Anything is possible with doorbot',
-  'The infinite is possible with doorbot',
-  'The unattainable is unknown with doorbot',
-  'You can do anything with doorbot',
-]
-welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
-ircsay(random.choice(welcomes))
-
-while (True):
     if card.select():
-        if currentCard == '' or currentCard != card.uid:
-            currentCard = card.uid
-            cards = reloadCardTable(cards)
+	if currentCard == '' or currentCard != card.uid:
+	    currentCard = card.uid
+	    reloadCardTable()
 
-            if currentCard in cards:
-                print '%s: authorised %s as %s' % \
-                        (datetime.now(), currentCard, cards[currentCard])
+	    if currentCard in cards:
+		print '%s: authorised %s as %s' % \
+			(datetime.now(), currentCard, cards[currentCard])
 
-                ser = serial.Serial("/dev/ttyUSB0", 9600)
-                ser.write("1");
-                ser.close();
+		ser.write("1");
 
-                try:
-                    print 'Logging to irccat on babbage'
-                    ircsay("%s opened the hackspace door." % cards[card.uid])
-                except Exception:
-                    pass
+		try:
+		    print 'Logging to IRC'
+		    ircsay("%s opened the hackspace door." % cards[card.uid])
+		except Exception:
+		    pass
 
-                try:
-                    print 'Turning on lights'
-                    urllib2.urlopen('http://172.31.24.101:8000/_/255,255,255?restoreAfter=10')
-                except Exception:
-                    pass
+		try:
+		    print 'Turning on lights'
+		    urllib2.urlopen('http://172.31.24.101:8000/_/255,255,255?restoreAfter=10')
+		except Exception:
+		    pass
 
-                try:
-                    print 'Displaying on board'
-                    #import pdb;pdb.set_trace()
-                    urllib2.urlopen('http://172.31.24.101:8020/%s%%20just%%20opened%%20the%%20door?restoreAfter=10' % cards[card.uid])
-                except Exception:
-                    pass
+		try:
+		    print 'Displaying on board'
+		    urllib2.urlopen('http://172.31.24.101:8020/'
+                            '%s%%20just%%20opened%%20the%%20door?restoreAfter=10' % cards[card.uid])
+		except Exception:
+		    pass
 
-                print 'Entrance complete'
+		print 'Entrance complete'
 
-            else:
-                print '%s: %s not authorised' % (datetime.now(), currentCard)
+	    else:
+		print '%s: %s not authorised' % (datetime.now(), currentCard)
     else:
-        currentCard = ''
+	currentCard = ''
 
     time.sleep(0.2)
+
+
+def checkForSerial(ser):
+
+    if ser.inWaiting() > 0:
+        print 'Response from serial: %s' % ser.readline()
+
+
+
+
+welcomed = False
+
+while True:
+
+    try:
+        card = RFIDIOtconfig.card
+        ser = serial.Serial("/dev/ttyUSB0", 9600)
+
+        if not welcomed:
+            welcome()
+            welcomed = True
+
+        while True:
+            checkForCard(card, ser)
+            checkForSerial(ser)
+
+    except (serial.SerialException, serial.SerialTimeoutException), e:
+        print e
+        ser.close()
+
+    except Exception, e:
+        print e
+        os._exit(True)
+
+
