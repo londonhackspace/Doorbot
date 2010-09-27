@@ -1,35 +1,62 @@
 int triggerPin = 13;
+int ledPin = 12;
 int doorBellButton = 2;
 
 void setup()
 {
   Serial.begin(9600);
   pinMode(triggerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+
 /*
   pinMode(doorBellButton, INPUT);
   pinMode(doorBellLEDGreen, OUTPUT);
   pinMode(doorBellLEDRed, OUTPUT);
   digitalWrite(doorBellButton, HIGH);
 */
+
+  // Booted signal
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(ledPin, LOW);
+    delay(300);
+    digitalWrite(ledPin, HIGH);
+    delay(100);
+  }
+
 }
 
 void loop()
 {
+
   // Check for door unlock command
   if (Serial.available() > 0) {
-    char inByte = Serial.read();
+    int inByte = Serial.read();
 
     if (inByte == '1') {
-      // Strobe a little
-      for (int i = 0; i < 2; i++) {
+      Serial.println("Opening door");
+      digitalWrite(ledPin, LOW);
+
+      if(false) {
+        // Strobe a little
+        for (int i = 0; i < 3; i++) {
+          digitalWrite(triggerPin, HIGH);
+          delay(100);
+          digitalWrite(triggerPin, LOW);
+          delay(30);
+        }
+      } else {
+        // Constant on
         digitalWrite(triggerPin, HIGH);
-        delay(100);
+        delay(1000);
         digitalWrite(triggerPin, LOW);
-        delay(30);
       }
-      delay(500); // Pause to ensure it resets
+
+      digitalWrite(ledPin, HIGH);
+      Serial.println("Door opened");
     }
+    Serial.flush();
   }
+
 /*
   // Check door bell button
   if(digitalRead(doorBellButton)){
@@ -41,4 +68,5 @@ void loop()
     digitalWrite(doorBellLEDGreen, HIGH);
   }
 */
+
 }
