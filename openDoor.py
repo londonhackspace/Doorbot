@@ -9,8 +9,10 @@ except:
 print 'Using port %s' % port
 
 ser = serial.Serial(port, 9600)
-time.sleep(2) # Wait for it to reboot
+print 'Opened. Waiting for reboot...'
+time.sleep(3) # Wait for it to reboot
 
+print 'Opening door...'
 ser.write('1')
 time.sleep(0.5)
 print 'Response: %s' % ser.readline()
