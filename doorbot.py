@@ -14,7 +14,6 @@ currentCard = ''
 
 
 def ircsay(msg):
-    return
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(('172.31.24.101', 12345))
     s.send(msg)
