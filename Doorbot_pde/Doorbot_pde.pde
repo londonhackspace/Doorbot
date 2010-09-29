@@ -1,8 +1,8 @@
 int triggerPin = 13;
 int ledPin = 12;
 int doorBellButton = 14;
-int doorBellLEDRed = 15;
-int doorBellLEDGreen = 16;
+int doorBellLEDRed = 16;
+int doorBellLEDGreen = 15;
 
 void setup()
 {
