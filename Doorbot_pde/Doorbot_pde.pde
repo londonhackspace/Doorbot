@@ -4,6 +4,15 @@ int doorBellButton = 14;
 int doorBellLEDRed = 16;
 int doorBellLEDGreen = 15;
 
+// Variables will change:
+int buttonState;             // the current reading from the input pin
+int lastButtonState = HIGH;   // the previous reading from the input pin
+
+// the following variables are long's because the time, measured in miliseconds,
+// will quickly become a bigger number than can be stored in an int.
+long lastDebounceTime = 0;  // the last time the output pin was toggled
+long debounceDelay = 50;    // the debounce time; increase if the output flickers
+
 void setup()
 {
   Serial.begin(9600);
@@ -12,9 +21,9 @@ void setup()
 
 
   pinMode(doorBellButton, INPUT);
+  digitalWrite(doorBellButton, HIGH);
   pinMode(doorBellLEDGreen, OUTPUT);
   pinMode(doorBellLEDRed, OUTPUT);
-  digitalWrite(doorBellButton, HIGH);
 
 
   // Booted signal
@@ -58,19 +67,48 @@ void loop()
       digitalWrite(doorBellLEDGreen, LOW);
       Serial.println("Door opened");
     }
+    else if (inByte == '2'){
+      // Turn Green on
+      digitalWrite(doorBellLEDGreen, HIGH);
+    }
+    else if (inByte == '3'){
+      // Turn Green off
+      digitalWrite(doorBellLEDGreen, LOW);
+    }
+    else if (inByte == '4'){
+      // Turn Red on
+      digitalWrite(doorBellLEDRed, HIGH);
+    }
+    else if (inByte == '5'){
+      // Turn Red off
+      digitalWrite(doorBellLEDRed, LOW);
+    }
+    
     Serial.flush();
   }
 
-/*
-  // Check door bell button
-  if(digitalRead(doorBellButton)){
-    digitalWrite(doorBellLEDGreen, LOW);
-    digitalWrite(doorBellLEDRed, HIGH);
-  }
-  else{
-    digitalWrite(doorBellLEDRed, LOW);
-    digitalWrite(doorBellLEDGreen, HIGH);
-  }
-*/
+  // read the state of the switch into a local variable:
+  int reading = digitalRead(doorBellButton);
+  
+  if (reading != lastButtonState) {
+    // reset the debouncing timer
+    lastDebounceTime = millis();
+    changed = 1;
+  } 
 
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    // whatever the reading is at, it's been there for longer
+    // than the debounce delay, so take it as the actual current state:
+    buttonState = reading;
+    if(changed == 1){
+      // Send bell pressed
+      if(buttonState == LOW){
+        Serial.print("1");
+      }
+      changed = 0;
+    }
+  }
+  // save the reading.  Next time through the loop,
+  // it'll be the lastButtonState:
+  lastButtonState = reading;
 }
