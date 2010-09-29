@@ -3,6 +3,7 @@ int ledPin = 12;
 int doorBellButton = 14;
 int doorBellLEDRed = 16;
 int doorBellLEDGreen = 15;
+int changed = 0;
 
 // Variables will change:
 int buttonState;             // the current reading from the input pin
