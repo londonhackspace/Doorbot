@@ -108,7 +108,7 @@ def checkForSerial(ser):
     if ser.inWaiting() > 0:
         line = ser.readline()
         print 'Response from serial: %s' % line
-        if line == '1':
+        if line == "1":
             ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
             urllib2.urlopen('http://172.31.24.101:8020/'
                             'BING BONG-DOOR BELL?restoreAfter=10')
