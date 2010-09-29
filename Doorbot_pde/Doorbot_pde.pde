@@ -41,10 +41,12 @@ void loop()
       if(false) {
         // Strobe a little
         for (int i = 0; i < 3; i++) {
+          digitalWrite(doorBellLEDGreen, HIGH);
           digitalWrite(triggerPin, HIGH);
           delay(100);
           digitalWrite(triggerPin, LOW);
           delay(30);
+          digitalWrite(doorBellLEDGreen, LOW);
         }
       } else {
         // Constant on
@@ -59,7 +61,7 @@ void loop()
     Serial.flush();
   }
 
-
+/*
   // Check door bell button
   if(digitalRead(doorBellButton)){
     digitalWrite(doorBellLEDGreen, LOW);
@@ -69,6 +71,6 @@ void loop()
     digitalWrite(doorBellLEDRed, LOW);
     digitalWrite(doorBellLEDGreen, HIGH);
   }
-
+*/
 
 }
