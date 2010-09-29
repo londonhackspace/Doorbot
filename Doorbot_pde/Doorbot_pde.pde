@@ -1,6 +1,8 @@
 int triggerPin = 13;
 int ledPin = 12;
-int doorBellButton = 2;
+int doorBellButton = 14;
+int doorBellLEDRed = 15;
+int doorBellLEDGreen = 16;
 
 void setup()
 {
@@ -8,12 +10,12 @@ void setup()
   pinMode(triggerPin, OUTPUT);
   pinMode(ledPin, OUTPUT);
 
-/*
+
   pinMode(doorBellButton, INPUT);
   pinMode(doorBellLEDGreen, OUTPUT);
   pinMode(doorBellLEDRed, OUTPUT);
   digitalWrite(doorBellButton, HIGH);
-*/
+
 
   // Booted signal
   for(int i = 0; i < 3; i++) {
@@ -57,7 +59,7 @@ void loop()
     Serial.flush();
   }
 
-/*
+
   // Check door bell button
   if(digitalRead(doorBellButton)){
     digitalWrite(doorBellLEDGreen, LOW);
@@ -67,6 +69,6 @@ void loop()
     digitalWrite(doorBellLEDRed, LOW);
     digitalWrite(doorBellLEDGreen, HIGH);
   }
-*/
+
 
 }
