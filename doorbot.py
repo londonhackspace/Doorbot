@@ -106,8 +106,15 @@ def checkForCard(card, ser):
 def checkForSerial(ser):
 
     if ser.inWaiting() > 0:
-        print 'Response from serial: %s' % ser.readline()
-
+        line = ser.readline()
+        print 'Response from serial: %s' % line
+        if line == "1"
+            ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
+            urllib2.urlopen('http://172.31.24.101:8020/'
+                            'BING BONG-DOOR BELL?restoreAfter=10')
+            ser.write("4");
+            time.sleep(5)
+            ser.write("5");
 
 
 
