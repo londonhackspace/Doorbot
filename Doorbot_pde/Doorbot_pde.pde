@@ -104,7 +104,7 @@ void loop()
     if(changed == 1){
       // Send bell pressed
       if(buttonState == LOW){
-        Serial.print("1");
+        Serial.println("1");
       }
       changed = 0;
     }
