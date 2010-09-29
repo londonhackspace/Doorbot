@@ -37,16 +37,15 @@ void loop()
     if (inByte == '1') {
       Serial.println("Opening door");
       digitalWrite(ledPin, LOW);
+      digitalWrite(doorBellLEDGreen, HIGH);
 
       if(false) {
         // Strobe a little
         for (int i = 0; i < 3; i++) {
-          digitalWrite(doorBellLEDGreen, HIGH);
           digitalWrite(triggerPin, HIGH);
           delay(100);
           digitalWrite(triggerPin, LOW);
           delay(30);
-          digitalWrite(doorBellLEDGreen, LOW);
         }
       } else {
         // Constant on
@@ -56,6 +55,7 @@ void loop()
       }
 
       digitalWrite(ledPin, HIGH);
+      digitalWrite(doorBellLEDGreen, LOW);
       Serial.println("Door opened");
     }
     Serial.flush();
