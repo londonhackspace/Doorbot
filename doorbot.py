@@ -117,10 +117,22 @@ def checkForSerial(ser):
                             'BING%20BONG%20DOOR%20BELL?restoreAfter=10')
             except Exception, e:
                 pass
+            
+            try:
+		        print 'Turning on lights'
+		        urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
+		    except Exception:
+		        pass
 
             ser.write("4");
             time.sleep(5)
             ser.write("5");
+
+            try:
+		        print 'Turning on lights'
+		        urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
+		    except Exception:
+		        pass
 
 
 
