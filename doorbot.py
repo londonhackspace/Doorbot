@@ -126,7 +126,9 @@ def checkForSerial(ser):
 
             ser.write("4");
             ser.write("6");
-            time.sleep(5)
+            time.sleep(3.5);
+            ser.write("6");
+            time.sleep(2);
             ser.write("5");
 
             try:
