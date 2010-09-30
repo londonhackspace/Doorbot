@@ -62,43 +62,43 @@ def checkForCard(card, ser):
     global currentCard
 
     if card.select():
-	if currentCard == '' or currentCard != card.uid:
-	    currentCard = card.uid
-	    reloadCardTable()
+        if currentCard == '' or currentCard != card.uid:
+            currentCard = card.uid
+            reloadCardTable()
 
-	    if currentCard in cards:
-		print '%s: authorised %s as %s' % \
-			(datetime.now(), currentCard, cards[currentCard])
+            if currentCard in cards:
+                print '%s: authorised %s as %s' % \
+                    (datetime.now(), currentCard, cards[currentCard])
 
-		ser.write("1");
+                ser.write("1");
 
-		try:
-		    print 'Logging to IRC'
-		    ircsay("%s opened the hackspace door." % cards[card.uid])
-		except Exception:
-		    pass
+                try:
+                    print 'Logging to IRC'
+                    ircsay("%s opened the hackspace door." % cards[card.uid])
+                except Exception:
+                    pass
 
-		try:
-		    print 'Turning on lights'
-		    urllib2.urlopen('http://172.31.24.101:8000/_/255,255,255?restoreAfter=10')
-		except Exception:
-		    pass
+                try:
+                    print 'Turning on lights'
+                    urllib2.urlopen('http://172.31.24.101:8000/_/255,255,255?restoreAfter=10')
+                except Exception:
+                    pass
 
-		try:
-		    print 'Displaying on board'
-		    urllib2.urlopen('http://172.31.24.101:8020/'
-                            '%s%%20just%%20opened%%20the%%20door?restoreAfter=10' % cards[card.uid])
-		except Exception:
-		    pass
+                try:
+                    print 'Displaying on board'
+                    urllib2.urlopen('http://172.31.24.101:8020/'
+                                    '%s%%20just%%20opened%%20the%%20door?restoreAfter=10' % cards[card.uid])
+                except Exception:
+                    pass
 
-		print 'Entrance complete'
+                print 'Entrance complete'
 
-	    else:
-		print '%s: %s not authorised' % (datetime.now(), currentCard)
-    else:
-	currentCard = ''
+            else:
+                print '%s: %s not authorised' % (datetime.now(), currentCard)
+        else:
+            currentCard = ''
 
-    time.sleep(0.2)
+            time.sleep(0.2)
 
 
 def checkForSerial(ser):
@@ -119,20 +119,20 @@ def checkForSerial(ser):
                 pass
             
             try:
-		        print 'Turning on lights'
-		        urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
-		    except Exception:
-		        pass
+                print 'Turning on lights'
+                urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
+            except Exception, e:
+                pass
 
             ser.write("4");
             time.sleep(5)
             ser.write("5");
 
             try:
-		        print 'Turning on lights'
-		        urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
-		    except Exception:
-		        pass
+                print 'Turning on lights'
+                urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
+            except Exception, e:
+                pass
 
 
 
