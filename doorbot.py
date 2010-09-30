@@ -114,7 +114,7 @@ def checkForSerial(ser):
 
             try:
                 urllib2.urlopen('http://172.31.24.101:8020/'
-                            'BING+BONG-DOOR+BELL?restoreAfter=10')
+                            'BING%20BONG%20DOOR%20BELL?restoreAfter=10')
             except Exception, e:
                 pass
 
