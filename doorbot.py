@@ -106,7 +106,7 @@ def checkForSerial(ser):
     if ser.inWaiting() > 0:
         line = ser.readline()
         print 'Response from serial: %s' % line
-        if line == "1":
+        if line.startswith == "1":
             try:
                 ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
             except Exception, e:
