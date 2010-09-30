@@ -106,21 +106,21 @@ def checkForSerial(ser):
     if ser.inWaiting() > 0:
         line = ser.readline()
         print 'Response from serial: %s' % line
-        #if line.startswith == "1":
-        try:
-            ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
-        except Exception, e:
-            pass
+        if line.startswith == 1:
+            try:
+                ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
+            except Exception, e:
+                pass
 
-        try:
-            urllib2.urlopen('http://172.31.24.101:8020/'
-                        'BING BONG-DOOR BELL?restoreAfter=10')
-        except Exception, e:
-            pass
+            try:
+                urllib2.urlopen('http://172.31.24.101:8020/'
+                            'BING+BONG-DOOR+BELL?restoreAfter=10')
+            except Exception, e:
+                pass
 
-        ser.write("4");
-        time.sleep(5)
-        ser.write("5");
+            ser.write("4");
+            time.sleep(5)
+            ser.write("5");
 
 
 
