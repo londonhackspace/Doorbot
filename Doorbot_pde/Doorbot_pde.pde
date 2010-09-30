@@ -26,6 +26,7 @@ void setup()
   digitalWrite(doorBellButton, HIGH);
   pinMode(doorBellLEDGreen, OUTPUT);
   pinMode(doorBellLEDRed, OUTPUT);
+  pinMode(sounder, OUTPUT);
 
 
   // Booted signal
