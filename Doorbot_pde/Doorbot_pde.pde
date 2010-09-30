@@ -84,6 +84,20 @@ void loop()
       // Turn Red off
       digitalWrite(doorBellLEDRed, LOW);
     }
+    else if (inByte == '6'){
+      digitalWrite(sounder, HIGH);
+      delay(500);
+      digitalWrite(sounder, LOW);
+      delay(500);
+      digitalWrite(sounder, HIGH);
+      delay(500);
+      digitalWrite(sounder, LOW);
+      delay(500);
+      digitalWrite(sounder, HIGH);
+      delay(500);
+      digitalWrite(sounder, LOW);
+      delay(500);
+    }
     
     Serial.flush();
   }
