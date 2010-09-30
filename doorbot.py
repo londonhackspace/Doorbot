@@ -21,10 +21,8 @@ def ircsay(msg):
 
 
 def welcome():
-
     print 'This is doorbot'
 
-    #ircsay('This is doorbot')
     welcomes = [
         'This is doorbot and welcome to you who have come to doorbot',
         'Anything is possible with doorbot',
@@ -109,9 +107,17 @@ def checkForSerial(ser):
         line = ser.readline()
         print 'Response from serial: %s' % line
         if line == "1":
-            ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
-            urllib2.urlopen('http://172.31.24.101:8020/'
+            try:
+                ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
+            except Exception, e:
+                pass
+
+            try:
+                urllib2.urlopen('http://172.31.24.101:8020/'
                             'BING BONG-DOOR BELL?restoreAfter=10')
+            except Exception, e:
+                pass
+
             ser.write("4");
             time.sleep(5)
             ser.write("5");
@@ -127,8 +133,11 @@ while True:
         ser = serial.Serial("/dev/ttyUSB0", 9600)
 
         if not welcomed:
-            welcome()
-            welcomed = True
+            try:
+                welcome()
+                welcomed = True
+            except Exception:
+                pass
 
         while True:
             checkForCard(card, ser)
