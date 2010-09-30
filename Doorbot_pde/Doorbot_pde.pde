@@ -100,7 +100,7 @@ void loop()
       delay(500);
     }
     
-    Serial.flush();
+    //Serial.flush();
   }
 
   // read the state of the switch into a local variable:
