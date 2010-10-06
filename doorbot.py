@@ -98,7 +98,7 @@ def checkForCard(card, ser):
         else:
             currentCard = ''
 
-            time.sleep(0.2)
+    time.sleep(0.2)
 
 
 def checkForSerial(ser):
@@ -156,6 +156,7 @@ while True:
 
         while True:
             checkForCard(card, ser)
+
             checkForSerial(ser)
 
     except (serial.SerialException, serial.SerialTimeoutException), e:
