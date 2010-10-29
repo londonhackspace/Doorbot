@@ -31,7 +31,8 @@ import RFIDIOtconfig
 
 
 cardFile = 'cardtable.dat'
-
+server = 'bell.lan'
+server = 'flowers'
 
 
 def addCard(id, name):
@@ -40,11 +41,11 @@ def addCard(id, name):
   file.write('%s %s\n' % (id, name))
   file.close()
 
-  os.system('scp cardtable.dat root@bell.lan:~/Doorbot/cardtable.dat')
+  os.system('scp cardtable.dat root@%s:~/Doorbot/cardtable.dat' % server)
 
 def readCardTable():
 
-  os.system('scp root@bell.lan:~/Doorbot/cardtable.dat cardtable.dat')
+  os.system('scp root@%s:~/Doorbot/cardtable.dat cardtable.dat' % server)
 
   # Two space separated fields, # for comments
   regex = re.compile("^([^#\n ]+) ([^#\n ]+)$")
