@@ -92,9 +92,11 @@ def checkForCard(card, ser):
                     pass
 
                 print 'Entrance complete'
+                time.sleep(1)
 
             else:
                 print '%s: %s not authorised' % (datetime.now(), currentCard)
+                ircsay('An unknown card was presented at the door')
         else:
             currentCard = ''
 
@@ -108,7 +110,7 @@ def checkForSerial(ser):
         print 'Response from serial: %s' % line
         if line.startswith("1"):
             try:
-                ircsay("BING BONG! Someone's at the door: http://hack.rs:8003")
+                ircsay("BING BONG! Someone's at the door: http://hack.rs:8003/")
             except Exception, e:
                 pass
 
