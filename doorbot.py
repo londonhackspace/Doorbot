@@ -96,7 +96,9 @@ def checkForCard(card, ser):
 
             else:
                 print '%s: %s not authorised' % (datetime.now(), currentCard)
-                ircsay('An unknown card was presented at the door')
+                ircsay('An unknown card was presented at the door http://hack.rs:8003/')
+                #TODO: red led?
+                time.sleep(5)
         else:
             currentCard = ''
 
