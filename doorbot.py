@@ -53,10 +53,10 @@ def reloadCardTable():
             if not entry.strip():
                 continue
 
-	    match = regex.match(entry)
+            match = regex.match(entry)
             if match:
-		id, name = match.groups()
-		cards[id] = name
+                id, name = match.groups()
+                cards[id] = name
             else:
                 print 'Invalid entry at line %d' % n
 
