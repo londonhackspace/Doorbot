@@ -45,16 +45,22 @@ def reloadCardTable():
         mTime = currentMtime
         cards = {};
 
-        regex = re.compile("^([^#\n ]+)\s*([^#\n ]+)?$")
-
         file = open(cardFile)
-        for line in file:
-            if regex.match(line):
-                matches = regex.findall(line)
-                id, name = matches[0]
-                cards[id] = name
 
-        print 'Loaded card table'
+        regex = re.compile("^([^\s]+)\s*((?:[^\s]| )+)?$")
+        for n, line in enumerate(file):
+            entry, h, comment = line.partition('#')
+            if not entry.strip():
+                continue
+
+	    match = regex.match(entry)
+            if match:
+		id, name = match.groups()
+		cards[id] = name
+            else:
+                print 'Invalid entry at line %d' % n
+
+        print 'Loaded %d cards' % len(cards)
 
 
 def checkForCard(card, ser):
@@ -145,6 +151,7 @@ def checkForSerial(ser):
 
 welcomed = False
 
+reloadCardTable()
 while True:
 
     try:
