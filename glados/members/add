@@ -1,0 +1,8 @@
+for file in *
+do
+  if [ -f $file ] ; then
+    # name without extension
+   
+    mv $file $file.wav
+  fi ;
+done

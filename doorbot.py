@@ -4,7 +4,7 @@ from datetime import datetime
 
 sys.path.append('RFIDIOt-0.1x') # use local copy for stability
 import RFIDIOtconfig
-
+import glados
 
 cardFile = 'cardtable.dat'
 
@@ -97,10 +97,19 @@ def checkForCard(card, ser):
                 except Exception:
                     pass
 
+                try:
+                    glados.playGreeting(card.uid)
+                except Exception:
+                    pass
+
                 print 'Entrance complete'
                 time.sleep(1)
 
             else:
+                try:
+                    glados.playDenied()
+                except Exception:
+                    pass
                 print '%s: %s not authorised' % (datetime.now(), currentCard)
                 ircsay('An unknown card was presented at the door http://hack.rs:8003/')
                 #TODO: red led?
@@ -118,6 +127,7 @@ def checkForSerial(ser):
         print 'Response from serial: %s' % line
         if line.startswith("1"):
             try:
+                glados.playDoorbell()
                 ircsay("BING BONG! Someone's at the door: http://hack.rs:8003/")
             except Exception, e:
                 pass
@@ -152,6 +162,9 @@ def checkForSerial(ser):
 welcomed = False
 
 reloadCardTable()
+glados.loadGreetings()
+glados.loadRandoms()
+
 while True:
 
     try:
