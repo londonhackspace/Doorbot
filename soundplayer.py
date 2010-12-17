@@ -12,6 +12,7 @@ __copyright__ = "Public domain"
 
 import sys
 import pygame
+import subprocess
 
 # global constants
 FREQ = 16000   # same as audio CD
@@ -24,13 +25,15 @@ def playsound(soundfile):
     """Play sound through default mixer channel in blocking manner.
     
     This will load the whole sound into memory before playback
+    For now, play with a command using mplayer!
     """
+    subprocess.call(["mplayer", soundfile])
 
-    sound = pygame.mixer.Sound(soundfile)
-    clock = pygame.time.Clock()
-    sound.play()
-    while pygame.mixer.get_busy():
-        clock.tick(FRAMERATE)
+    #sound = pygame.mixer.Sound(soundfile)
+    #clock = pygame.time.Clock()
+    #sound.play()
+    #while pygame.mixer.get_busy():
+    #    clock.tick(FRAMERATE)
 
 def playmusic(soundfile):
     """Stream music with mixer.music module in blocking manner.

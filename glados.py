@@ -28,11 +28,17 @@ def loadRandoms ():
 
 def playGreeting(id):
   random.seed()
-  if id in waves.keys():
-    soundplayer.main(["glados/fixed/hackspacewelcome.wav","glados/fixed/hackspacetestsubject.wav", "glados/members/" + waves[id], "glados/fixed/hackspacedoor.wav" ])
-  if random.randint(0,5) == 4:
-    r = random.randint(0,len(randoms) -1)
-    soundplayer.main(["glados/random/" + randoms[r] ]) 
+  if id == '15FAA09E':
+    soundplayer.main(["glados/fixed/hackspacewelcome.wav","glados/members/jonty.wav"])
+  else:
+    if id in waves.keys():
+      if waves[id] == "broken.wav":
+        soundplayer.main([waves[id]])
+      else:
+        soundplayer.main(["glados/fixed/hackspacewelcome.wav","glados/fixed/hackspacetestsubject.wav", "glados/members/" + waves[id], "glados/fixed/hackspacedoor.wav" ])
+    if random.randint(0,5) == 4:
+      r = random.randint(0,len(randoms) -1)
+      soundplayer.main(["glados/random/" + randoms[r] ]) 
   
 def playDenied():
   soundplayer.main(["glados/fixed/hackspacedenied.wav"])
