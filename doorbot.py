@@ -4,34 +4,12 @@ from datetime import datetime
 
 sys.path.append('RFIDIOt-0.1x') # use local copy for stability
 import RFIDIOtconfig
-import glados
 
 cardFile = 'cardtable.dat'
 
 mTime = 0
 cards = {}
 currentCard = ''
-
-
-def ircsay(msg):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('172.31.24.101', 12345))
-    s.send(msg)
-    s.close()
-
-
-def welcome():
-    print 'This is doorbot'
-
-    welcomes = [
-        'This is doorbot and welcome to you who have come to doorbot',
-        'Anything is possible with doorbot',
-        'The infinite is possible with doorbot',
-        'The unattainable is unknown with doorbot',
-        'You can do anything with doorbot',
-    ]
-    welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
-    ircsay(random.choice(welcomes))
 
 
 def reloadCardTable():
@@ -78,42 +56,19 @@ def checkForCard(card, ser):
 
                 ser.write("1");
 
-                try:
-                    print 'Logging to IRC'
-                    ircsay("%s opened the hackspace door." % cards[card.uid])
-                except Exception:
-                    pass
-
-                try:
-                    print 'Turning on lights'
-                    urllib2.urlopen('http://172.31.24.101:8000/_/255,255,255?restoreAfter=10')
-                except Exception:
-                    pass
-
-                try:
-                    print 'Displaying on board'
-                    urllib2.urlopen('http://172.31.24.101:8020/'
-                                    '%s%%20just%%20opened%%20the%%20door?restoreAfter=10' % cards[card.uid])
-                except Exception:
-                    pass
-
-                try:
-                    glados.playGreeting(card.uid)
-                except Exception:
-                    pass
+                broadcast('RFID', currentCard, cards[card.uid])
 
                 print 'Entrance complete'
                 time.sleep(1)
 
             else:
-                try:
-                    glados.playDenied()
-                except Exception:
-                    pass
                 print '%s: %s not authorised' % (datetime.now(), currentCard)
-                ircsay('An unknown card was presented at the door http://hack.rs:8003/')
-                #TODO: red led?
-                time.sleep(5)
+                broadcast('RFID', currentCard, '')
+
+                ser.write("6"); # Red on
+                time.sleep(2)
+                ser.write("5"); # Red off
+
         else:
             currentCard = ''
 
@@ -125,74 +80,58 @@ def checkForSerial(ser):
     if ser.inWaiting() > 0:
         line = ser.readline()
         print 'Response from serial: %s' % line
+
         if line.startswith("1"):
-            try:
-               ircsay("BING BONG! Someone's at the door: http://hack.rs:8003/")
-            except Exception, e:
-                pass
+            broadcast('BELL', '', '')
 
-            try:
-                print 'Turning on lights'
-                urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
-            except Exception, e:
-                pass
+            ser.write("6"); # Piezo
 
-            ser.write("4");
-            try:
-                glados.playDoorbell()
-            except Exception, e:
-                pass
-            ser.write("6");
+            for i in range(2):
+                ser.write("4"); # Red on
+                time.sleep(1);
+                ser.write("5"); # Red off
 
-            try:
-                urllib2.urlopen('http://172.31.24.101:8020/'
-                            'BING%20BONG%20DOOR%20BELL?restoreAfter=10')
-            except Exception, e:
-                pass
+                ser.write("2"); # Green on
+                time.sleep(1);
+                ser.write("3"); # Green off
 
 
-            time.sleep(3.5);
-            time.sleep(2);
-            ser.write("5");
-
-            try:
-                print 'Turning on lights'
-                urllib2.urlopen('http://172.31.24.101:8000/_/255,0,0?restoreAfter=4')
-            except Exception, e:
-                pass
-
-
-
-welcomed = False
-
-reloadCardTable()
-glados.loadGreetings()
-glados.loadRandoms()
-
-while True:
+def broadcast(event, card, name):
 
     try:
-        card = RFIDIOtconfig.card
-        ser = serial.Serial("/dev/ttyUSB0", 9600)
+        print "Broadcasting %s to network" % event
 
-        if not welcomed:
-            try:
-                welcome()
-                welcomed = True
-            except Exception:
-                pass
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.bind(('', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-        while True:
-            checkForCard(card, ser)
-
-            checkForSerial(ser)
-
-    except (serial.SerialException, serial.SerialTimeoutException), e:
-        print e
-        ser.close()
+        data = "%s\n%s\n%s" % (event, card, name)
+        s.sendto(data, ('<broadcast>', 50000))
 
     except Exception, e:
-        print e
-        os._exit(True)
+        pass
 
 
+
+if __name__ == "__main__":
+
+    reloadCardTable()
+    broadcast('START', '', '')
+
+    while True:
+
+        try:
+            card = RFIDIOtconfig.card
+            ser = serial.Serial("/dev/ttyUSB0", 9600)
+
+            while True:
+                checkForCard(card, ser)
+                checkForSerial(ser)
+
+        except (serial.SerialException, serial.SerialTimeoutException), e:
+            print e
+            ser.close()
+
+        except Exception, e:
+            print e
+            os._exit(True)
