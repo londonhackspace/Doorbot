@@ -54,12 +54,9 @@ def checkForCard(card, ser):
                 print '%s: authorised %s as %s' % \
                     (datetime.now(), currentCard, cards[currentCard])
 
-                ser.write("1");
+                ser.write("1"); # Trigger door relay
 
                 broadcast('RFID', currentCard, cards[card.uid])
-
-                print 'Entrance complete'
-                time.sleep(1)
 
             else:
                 print '%s: %s not authorised' % (datetime.now(), currentCard)
@@ -84,16 +81,9 @@ def checkForSerial(ser):
         if line.startswith("1"):
             broadcast('BELL', '', '')
 
+            ser.write("2"); # Green on
             ser.write("6"); # Piezo
-
-            for i in range(2):
-                ser.write("4"); # Red on
-                time.sleep(1);
-                ser.write("5"); # Red off
-
-                ser.write("2"); # Green on
-                time.sleep(1);
-                ser.write("3"); # Green off
+            ser.write("3"); # Green off
 
 
 def broadcast(event, card, name):
