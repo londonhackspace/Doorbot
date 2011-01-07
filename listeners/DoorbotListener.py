@@ -28,10 +28,10 @@ class DoorbotListener():
                 self.startup()
 
 
-    def doorOpened(self):
+    def doorOpened(self, serial, name):
         pass
 
-    def unknownCard(self):
+    def unknownCard(self, serial):
         pass
 
     def doorbell(self):
