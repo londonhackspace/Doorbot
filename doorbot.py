@@ -16,7 +16,10 @@ def reloadCardTable():
     global mTime
     global cards
 
-    currentMtime = os.path.getmtime(cardFile)
+    try:
+        currentMtime = os.path.getmtime(cardFile)
+    except IOError, e:
+        print e    
 
     if mTime != currentMtime:
         print "Loading card table, mtime %d" % currentMtime
