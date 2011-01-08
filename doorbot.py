@@ -65,8 +65,8 @@ def checkForCard(card, ser):
                 print '%s: %s not authorised' % (datetime.now(), currentCard)
                 broadcast('RFID', currentCard, '')
 
-                ser.write("6"); # Red on
-                time.sleep(2)
+                ser.write("4"); # Red on
+                ser.write("6"); # Piezo (Sleeps on the arduino for 3s)
                 ser.write("5"); # Red off
 
             time.sleep(2) # To avoid read bounces if the card is _just_ in range
@@ -87,7 +87,7 @@ def checkForSerial(ser):
             broadcast('BELL', '', '')
 
             ser.write("2"); # Green on
-            ser.write("6"); # Piezo
+            ser.write("6"); # Piezo (Sleeps on the arduino for 3s)
             ser.write("3"); # Green off
 
 
