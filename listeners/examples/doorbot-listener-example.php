@@ -1,23 +1,23 @@
 <?php
 
-    require_once('DoorbotListener.class.php');
+    require_once('../DoorbotListener.class.php');
 
     class ExampleListener extends DoorbotListener {
 
         function doorOpened ($serial, $name) {
-            print "The door was opened\n";
+            print "The door was opened by {$name}, card serial {$serial}.\n";
         }
 
         function unknownCard ($serial) {
-            print "An unknown card was used on the door\n";
+            print "Unknown card {$serial} presented at the door.\n";
         }
 
         function doorbell () {
-            print "The doorbell was pressed\n";
+            print "Doorbell pressed.\n";
         }
 
         function startup () {
-            print "Doorbot just started up\n";
+            print "Doorbot started.\n";
         }
 
     }

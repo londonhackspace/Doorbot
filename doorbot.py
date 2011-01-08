@@ -69,6 +69,8 @@ def checkForCard(card, ser):
                 time.sleep(2)
                 ser.write("5"); # Red off
 
+            time.sleep(2) # To avoid read bounces if the card is _just_ in range
+
         else:
             currentCard = ''
 
