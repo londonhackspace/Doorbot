@@ -4,8 +4,6 @@ import DoorbotListener, socket, random
 class IrccatListener(DoorbotListener.DoorbotListener):
 
     def startup(self):
-        self.sendMessage('This is doorbot')
-
         welcomes = [
             'This is doorbot and welcome to you who have come to doorbot',
             'Anything is possible with doorbot',
