@@ -39,6 +39,9 @@ def playGreeting(id):
         soundplayer.main([waves[id]])
       else:
         soundplayer.main(["wavefiles/fixed/hackspacewelcome.wav","wavefiles/fixed/hackspacetestsubject.wav", "wavefiles/members/" + waves[id], "wavefiles/fixed/hackspacedoor.wav" ])
+    else:
+        soundplayer.main(["wavefiles/fixed/hackspacelonely.wav"])    
+
     if random.randint(0,5) == 4:
       r = random.randint(0,len(randoms) -1)
       soundplayer.main(["wavefiles/random/" + randoms[r] ]) 
