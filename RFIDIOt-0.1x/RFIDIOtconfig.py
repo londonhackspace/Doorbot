@@ -66,7 +66,7 @@ line= "/dev/ttyUSB0"
 readertype= RFIDIOt.rfidiot.READER_PCSC
 
 # PCSC reader number (can be overridden with -r)
-readernum= 1
+readernum= 0
 
 # serial port speed (can be overridden with -s)
 # ignored for PCSC
