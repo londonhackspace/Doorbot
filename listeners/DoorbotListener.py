@@ -11,21 +11,26 @@ class DoorbotListener():
 
         while True:
 
-            result = select.select([s],[],[])
-            payload = result[0][0].recv(1024)
-            (event, serial, name) = payload.split("\n")
+            try:
 
-            if (event == 'RFID' and name):
-                self.doorOpened(serial, name)
+                result = select.select([s],[],[])
+                payload = result[0][0].recv(1024)
+                (event, serial, name) = payload.split("\n")
 
-            elif (event == 'RFID' and not name):
-                self.unknownCard(serial)
+                if (event == 'RFID' and name):
+                    self.doorOpened(serial, name)
 
-            elif (event == 'BELL'):
-                self.doorbell()
+                elif (event == 'RFID' and not name):
+                    self.unknownCard(serial)
 
-            elif (event == 'START'):
-                self.startup()
+                elif (event == 'BELL'):
+                    self.doorbell()
+
+                elif (event == 'START'):
+                    self.startup()
+
+            except:
+                pass
 
 
     def doorOpened(self, serial, name):
