@@ -1,7 +1,16 @@
-15FAA09E jonty.wav
+# Brief overview
+# The columns are: 
+# carddetails (one or more space seperated backgroundwavs) foregroundgreeting
+# For foregroundgreeting it has three options based on the filename
+# start
+# welcome- will get glados to say hello
+# member- will give the whole spiel
+# Anything else will just play that file and nothing else
+# Note: No spaces allowed in filenames 
+15FAA09E welcome-jonty.wav
 51DBC4CD member-001.wav
 8290EC99 member-002.wav
-#- member-003.wav
+943CD252 mark.wav
 6489024D member-004.wav
 0543A589_w member-005.wav
 046F5731F72580 member-006.wav
@@ -14,8 +23,8 @@ DAF0C0BB member-008.wav
 3510261E member-013.wav
 7C4E4561 member-014.wav
 CB3AFA5B member-015.wav
-#37220641 member-016.wav
-37220641 tomScott.wav
+37220641 member-016.wav
+#37220641 tomScott.wav
 25DDCF3D member-017.wav
 2C5CFA60 member-018.wav
 D711F592 member-019.wav
@@ -149,4 +158,4 @@ D113B9CA member-140.wav
 CB9D258E broken.wav
 042142AAEA1D80 broken.wav
 04544DD9372280 broken.wav
-04497092E42280 ciemon.wav
+04497092E42280 member-ciemon.wav
