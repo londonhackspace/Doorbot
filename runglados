@@ -1,0 +1,19 @@
+#!/bin/bash
+
+pushd /root/Doorbot/listeners/glados
+
+if [ "$1" != 1 ]; then
+  screen -dmS glados $0 1
+else
+  echo Starting glados...
+  echo $$ >/var/run/runglados.pid
+  while true; do
+    python ./doorbot-glados.py -r0
+    echo Glados exited. Restarting shortly...
+    #echo Restarting glados |nc -q1 172.31.24.101 12345
+    sleep 5
+  done
+fi
+
+popd
+
