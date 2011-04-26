@@ -1,9 +1,10 @@
-int triggerPin = 13;
-int ledPin = 12;
-int doorBellButton = 14;
-int doorBellLEDRed = 16;
-int doorBellLEDGreen = 15;
-int sounder = 17;
+int triggerPin = D13;
+int ledPin = D12;
+// We're using analogue pins in digital mode.
+int doorBellButton = A0;
+int doorBellLEDRed = A2;
+int doorBellLEDGreen = A1;
+int sounder = A3;
 int changed = 0;
 
 // Variables will change:
