@@ -75,40 +75,38 @@ def loadRandoms ():
 def playGreeting(id):
   mfolder = "wavefiles/members/"
   ffolder = "wavefiles/fixed/"
-  welcomesound = ffolder + "hackspacewelcome.wav"
   
   if id in waves:
     
     sounds = waves[id].split(' ')
-    memberfiles = [ mfolder + s for s in sounds ]
+    membersound = sounds[-1]
 
+    # FIXME: it seems wrong that these are played before the first one
     if len(sounds) > 1:
-      # Play the first lot in the background   
-      length = len(sounds)
-      playSoundsBackgrounda(memberfiles[:-1])
-
-    membersound = memberfiles[-1]
+      # Play the first lot in the background
+      soundfiles = [mfolder + s for s in sounds[:-1]]
+      playSoundsBackground(soundfiles)
 
     if membersound.startswith('member-'):
       # Do the whole member spiel
       playSounds([
-        welcomesound,
+        ffolder + "hackspacewelcome.wav",
         ffolder + "hackspacetestsubject.wav",
-        membersound,
+        mfolder + membersound,
         ffolder + "hackspacedoor.wav",
       ])
 
     elif membersound.startswith('welcome-'):
       # Slightly abbreviated
       playSounds([
-        welcomesound,
-        membersound,
+        ffolder + "hackspacewelcome.wav",
+        mfolder + membersound,
       ])
 
     else:
       # Purely custom sound
       playSounds([
-        membersound,
+        mfolder + membersound,
       ])
 
   else:
