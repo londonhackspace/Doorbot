@@ -11,19 +11,33 @@ waves = {}
 randoms = []
 lastmodified = []
 
+random.seed()
 
+
+def getcmd(sound):
+  if sound.endswith('mp3'):
+    return 'mpg123 %s' % sound
+  else:
+    return 'aoss bplay %s '% sound
+ 
 def playSoundsBackground( sounds):
-  
-   files  = [os.getcwd() + "/" + s  for s in sounds ]
-   filesstring = " ".join(files)
-   string =  "/usr/bin/mplayer "+ filesstring+ " < /dev/null &"
-   #print string
-   subprocess.Popen( string, shell=True) 
+  cmds = [getcmd(s) for s in sounds]
+
+  # & is for Windows support
+  cmdstring = '; '.join(cmds) + ' &'
+  print 'Playing %s' % cmdstring
+
+  subprocess.Popen(cmdstring, shell=True) 
 
 def playSounds(sounds):
-  for sound in sounds:
-    print "playing " + sound
-    subprocess.call(["mplayer", sound])
+  cmds = [getcmd(s) for s in sounds]
+
+  cmdstring = '; '.join(cmds)
+  print 'Playing %s' % cmdstring
+
+  proc = subprocess.Popen(cmdstring, shell=True)
+  proc.wait()
+
 
 
 def loadGreetings():
@@ -42,55 +56,70 @@ def loadGreetings():
       print 'Invalid entry at line %d' % n
 
 def checkNewGreetings():
-   stat = os.stat (wavefile)
-   print lastmodified
-   if (not (stat.st_mtime in lastmodified)):
-     print "loading greetings"   
-     loadGreetings()
-     del lastmodified[0]
-     lastmodified.append(stat.st_mtime)
+  try:
+    stat = os.stat(wavefile)
+    if stat.st_mtime != lastmodified:
+      print "Loading new greetings"
+      loadGreetings()
+      lastmodified = stat.st_mtime
+
+  except Exception, e:
+    print 'Unable to check for new greetings'
+
 def loadRandoms ():
-  for f in os.listdir("./wavefiles/random"):
+  for f in os.listdir("wavefiles/random"):
     randoms.append(f)
 
+
+
 def playGreeting(id):
-  random.seed()
-  print lastmodified
-  welcome = re.compile("^welcome-")
-  member = re.compile("^member-")
   mfolder = "wavefiles/members/"
   ffolder = "wavefiles/fixed/"
-  rfolder = "wavefiles/random/"
-  welcomesound = ffolder + "hackspacewelcome.wav"
   
   if id in waves:
     
     sounds = waves[id].split(' ')
-    mainsound  = sounds[len(sounds)-1]
-    memberfiles = [ mfolder + s  for s in sounds ]
- # More than one sound, play the first lot in the background   
+    membersound = sounds[-1]
+
+    # FIXME: it seems wrong that these are played before the first one
     if len(sounds) > 1:
-      length = len(sounds)
-      playSoundsBackground (memberfiles[:length-1])
-      membersound = memberfiles [length-1]
-    else:
-      membersound =  mfolder + waves [id]
+      # Play the first lot in the background
+      soundfiles = [mfolder + s for s in sounds[:-1]]
+      playSoundsBackground(soundfiles)
 
-    if member.match (mainsound):
-      playSounds([welcomesound ,ffolder+ "hackspacetestsubject.wav", membersound , ffolder +"hackspacedoor.wav" ])
+    if membersound.startswith('member-'):
+      # Do the whole member spiel
+      playSounds([
+        ffolder + "hackspacewelcome.wav",
+        ffolder + "hackspacetestsubject.wav",
+        mfolder + membersound,
+        ffolder + "hackspacedoor.wav",
+      ])
 
-    elif welcome.match(mainsound):
-      playSounds([ffolder + "hackspacewelcome.wav", membersound])
+    elif membersound.startswith('welcome-'):
+      # Slightly abbreviated
+      playSounds([
+        ffolder + "hackspacewelcome.wav",
+        mfolder + membersound,
+      ])
+
     else:
-      playSounds([membersound])
+      # Purely custom sound
+      playSounds([
+        mfolder + membersound,
+      ])
+
   else:
       playSounds([ffolder + "hackspacelonely.wav"])    
 
+
   if random.randint(0,5) == 4:
-    r = random.randint(0,len(randoms) -1)
-    playSounds(["wavefiles/random/" + randoms[r] ]) 
-  checkNewGreetings()
-  
+    playSounds([
+      "wavefiles/random/" + random.choice(randoms),
+    ])
+
+ 
+ 
 def playDenied():
   playSounds(["wavefiles/fixed/hackspacedenied.wav"])
 
@@ -111,6 +140,7 @@ class GladosListener(DoorbotListener.DoorbotListener):
     def doorOpened(self, serial, name):
         print "Door opened"
 
+        checkNewGreetings()
         try:
             playGreeting(serial)
         except Exception, e:
@@ -129,7 +159,8 @@ class GladosListener(DoorbotListener.DoorbotListener):
 if __name__ == "__main__":
     loadGreetings()
     loadRandoms()
-    lastmodified. append( os.stat(wavefile).st_mtime)
+    lastmodified = os.stat(wavefile).st_mtime
     print lastmodified
     listener = GladosListener()
     listener.listen()
+

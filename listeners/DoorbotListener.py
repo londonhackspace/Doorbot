@@ -29,7 +29,7 @@ class DoorbotListener():
                 elif (event == 'START'):
                     self.startup()
 
-            except:
+            except Exception, e:
                 pass
 
 
