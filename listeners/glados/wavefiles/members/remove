@@ -1,8 +1,0 @@
-for file in *
-do
-  if [ -f $file ] ; then
-    # name without extension
-    name=${file%\.*}
-    mv $file $name
-  fi ;
-done

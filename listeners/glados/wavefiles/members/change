@@ -1,3 +1,0 @@
-for a in member-[0-9][0-9]; do
-  mv $a `printf member-%03d ${a#member-}`
-done
