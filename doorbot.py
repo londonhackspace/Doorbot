@@ -2,6 +2,7 @@
 import sys, os, time, re, socket, serial, urllib2, random
 from datetime import datetime
 import logging
+import json
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
 logging.info('Starting doorbot')
@@ -14,7 +15,7 @@ except Exception, e:
     logging.critical('Error importing RFIDIOt: %s', e)
     sys.exit(1)
 
-cardFile = 'cardtable.dat'
+cardFile = 'carddb.json'
 
 mTime = 0
 cards = {}
@@ -38,18 +39,15 @@ def reloadCardTable():
 
         file = open(cardFile)
 
-        regex = re.compile("^([^\s]+)\s*((?:[^\s]| )+)?$")
-        for n, line in enumerate(file):
-            entry, h, comment = line.partition('#')
-            if not entry.strip():
-                continue
+        users = json.load(file)
 
-            match = regex.match(entry)
-            if match:
-                id, name = match.groups()
-                cards[id] = name
-            else:
-                logging.warn('Invalid entry at line %d', n)
+        for user in users:
+            for card in user['cards']:
+              card = card.encode('utf-8')
+              nick = user['nick'].encode('utf-8')
+              cards[card] = nick
+
+        print repr(cards)
 
         logging.info('Loaded %d cards', len(cards))
 
