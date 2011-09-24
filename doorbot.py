@@ -16,10 +16,47 @@ except Exception, e:
     sys.exit(1)
 
 cardFile = 'carddb.json'
+cardFileOld = 'cardtable.dat'
 
 mTime = 0
+mTimeOld = 0
+
 cards = {}
+cardsOld = {}
+
 currentCard = ''
+
+def applyOldCardTable():
+    global mTimeOld
+    global cardsOld
+
+    try:
+        currentMtime = os.path.getmtime(cardFileOld)
+    except IOError, e:
+        logging.critical('Cannot read old card file: %s', e)
+        raise
+
+    if mTimeOld != currentMtime:
+
+        logging.debug('Loading old card table, mtime %d', currentMtime)
+        mTimeOld = currentMtime
+
+        file = open(cardFileOld)
+
+        regex = re.compile("^([^\s]+)\s*((?:[^\s]| )+)?$")
+        for n, line in enumerate(file):
+            entry, h, comment = line.partition('#')
+            if not entry.strip():
+                continue
+
+            match = regex.match(entry)
+            if match:
+                id, name = match.groups()
+                cardsOld[id] = name
+            else:
+                logging.warn('Invalid entry at line %d', n)
+
+        logging.debug('Loaded %d cards', len(cardsOld))
 
 
 def reloadCardTable():
@@ -33,6 +70,7 @@ def reloadCardTable():
         raise
 
     if mTime != currentMtime:
+
         logging.debug('Loading card table, mtime %d', currentMtime)
         mTime = currentMtime
         cards = {};
@@ -46,8 +84,6 @@ def reloadCardTable():
               card = card.encode('utf-8')
               nick = user['nick'].encode('utf-8')
               cards[card] = nick
-
-        print repr(cards)
 
         logging.info('Loaded %d cards', len(cards))
 
@@ -65,15 +101,27 @@ def checkForCard(card, ser):
         if currentCard == '' or currentCard != card.uid:
             currentCard = card.uid
             reloadCardTable()
+            applyOldCardTable()
 
             if currentCard in cards:
                 logging.info('%s authorised as %s',
                     currentCard, cards[currentCard])
 
-                logging.debug('Sending door open')
-                ser.write("1"); # Trigger door relay
+                logging.debug('Triggering door relay')
+                ser.write("1");
 
+                logging.debug('Broadcasting to network')
                 broadcast('RFID', currentCard, cards[card.uid])
+
+            elif currentCard in cardsOld:
+                logging.info('%s authorised as %s',
+                    currentCard, cardsOld[currentCard])
+
+                logging.debug('Triggering door relay')
+                ser.write("1");
+
+                logging.debug('Broadcasting to network')
+                broadcast('RFID', currentCard, cardsOld[card.uid])
 
             else:
                 logging.warn('%s not authorised', currentCard)
@@ -125,6 +173,7 @@ def broadcast(event, card, name):
 if __name__ == "__main__":
 
     reloadCardTable()
+    applyOldCardTable()
     logging.info('Announcing start')
     broadcast('START', '', '')
 
