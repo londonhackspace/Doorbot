@@ -10,6 +10,8 @@ import sys, logging
 BASE_URL = 'https://london.hackspace.org.uk/'
 #BASE_URL = 'http://lhs.samsung/'
 
+logging.basicConfig(level=logging.DEBUG)
+
 cookiejar = cookielib.CookieJar()
 processor = urllib2.HTTPCookieProcessor(cookiejar)
 opener = urllib2.build_opener(processor)
@@ -62,6 +64,7 @@ logged_in = browse('login.php', {
 
 exc = find_exception(logged_in)
 if exc:
+  print 'Could not authenticate'
   logging.debug(etree.tostring(exc[0], method="text", pretty_print=True))
   sys.exit(1)
 
@@ -81,7 +84,8 @@ card_added = browse('/members/addcard.php', {
 
 exc = find_exception(card_added)
 if exc:
+  print 'Could not add card'
   logging.debug(etree.tostring(exc[0], method="text", pretty_print=True))
   sys.exit(1)
 
-print "Card successfully added"
+print "Card %s successfully added" % uid
