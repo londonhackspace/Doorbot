@@ -40,6 +40,7 @@ def applyOldCardTable():
 
         logging.debug('Loading old card table, mtime %d', currentMtime)
         mTimeOld = currentMtime
+        cardsOld = {}
 
         file = open(cardFileOld)
 
