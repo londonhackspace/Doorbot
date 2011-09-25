@@ -24,7 +24,28 @@ def browse(url, params=None):
 find_exception = CSSSelector('.exception')
 
 
-uid = raw_input('Card ID: ')
+if len(sys.argv) > 1:
+  try:
+    sys.path.append('RFIDIOt-0.1x') # use local copy for stability
+    import RFIDIOtconfig
+
+  except Exception, e:
+    logging.critical('Error importing RFIDIOt: %s', e)
+    sys.exit(1)
+
+  card = RFIDIOtconfig.card
+  print 'Checking for card...'
+
+  while not card.select():
+    # Yeah, we really should rewrite RFIDIOt
+    if card.errorcode != card.PCSC_NO_CARD:
+      raise Exception('Error %s selecting card' % card.errorcode)
+
+  uid = card.uid
+
+else:
+  uid = raw_input('Card ID: ')
+
 email = raw_input('Email: ')
 password = getpass.getpass('Password: ')
 print
