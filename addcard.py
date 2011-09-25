@@ -5,7 +5,7 @@ import urllib2, cookielib
 from lxml import etree
 from lxml.cssselect import CSSSelector
 import getpass
-import sys
+import sys, logging
 
 BASE_URL = 'https://london.hackspace.org.uk/'
 #BASE_URL = 'http://lhs.samsung/'
@@ -62,7 +62,7 @@ logged_in = browse('login.php', {
 
 exc = find_exception(logged_in)
 if exc:
-  print etree.tostring(exc[0], method="text", pretty_print=True)
+  logging.debug(etree.tostring(exc[0], method="text", pretty_print=True))
   sys.exit(1)
 
 loggedin_p = logged_in.xpath('//p[@id="loggedin"]')
@@ -81,7 +81,7 @@ card_added = browse('/members/addcard.php', {
 
 exc = find_exception(card_added)
 if exc:
-  print etree.tostring(exc[0], method="text", pretty_print=True)
+  logging.debug(etree.tostring(exc[0], method="text", pretty_print=True))
   sys.exit(1)
 
 print "Card successfully added"
