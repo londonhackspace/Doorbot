@@ -74,7 +74,7 @@ def reloadCardTable():
 
         logging.debug('Loading card table, mtime %d', currentMtime)
         mTime = currentMtime
-        cards = {};
+        cards = {}
 
         file = open(cardFile)
 
