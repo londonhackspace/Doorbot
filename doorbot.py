@@ -182,20 +182,35 @@ if __name__ == "__main__":
 
         logging.debug('Starting main loop')
 
+        ser = None
         try:
             card = RFIDIOtconfig.card
             ser = serial.Serial("/dev/ttyUSB0", 9600)
 
+        except (serial.SerialException, serial.SerialTimeoutException), e:
+            logging.warn('Serial error during initialisation: %s', e)
+            break
+
+        except Exception, e:
+            logging.critical('Unexpected error during initialisation: %s', e)
+            break
+
+
+        try:
             while True:
                 checkForCard(card, ser)
                 time.sleep(0.2)
                 checkForSerial(ser)
 
         except (serial.SerialException, serial.SerialTimeoutException), e:
-            logging.warn('Serial error during main loop: %s', e)
-            ser.close()
+            logging.warn('Serial error during poll: %s', e)
+            if ser:
+              ser.close()
 
         except Exception, e:
-            logging.critical('Unexpected error during main loop: %s', e)
-            os._exit(True) # Otherwise RFIDIOt interferes in cleanup
+            logging.critical('Unexpected error during poll: %s', e)
 
+        # If it was working, give it some time to settle
+        time.sleep(5)
+
+    os._exit(True) # Otherwise RFIDIOt interferes in cleanup
