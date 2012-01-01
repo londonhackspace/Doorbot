@@ -40,7 +40,18 @@ class IrccatListener(DoorbotListener.DoorbotListener):
         self.sendMessage(random.choice(welcomes))
 
     def doorbell(self):
-        self.sendMessage("BING BONG DOOR BELL! http://hackspace.org.uk:8003")
+        today = datetime.date.today()
+        m, d = today.month, today.day
+        if (m, d) >= (12, 24) and (m, d) <= (12, 31):
+            msg = 'DING DONG MERRILY ON HIGH, DOOR BELL!'
+        else:
+            msg = 'DING DONG, DOOR BELL!'
+
+        self.sendMessage(' ',join((
+            msg,
+            'http://hack.rs/doorbell.jpg',
+            'http://london.hackspace.org.uk/members/webcams.php?camera=3',
+        )))
 
     def doorOpened(self, serial, name):
 
@@ -53,7 +64,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
 
             self.sendMessage(
                 "%s opened the hackspace door. (Last seen %s ago)" % (
-                    name.title(),
+                    name,
                     untilmsg(datetime.datetime.now() - d)
                 )
             )
