@@ -6,6 +6,8 @@ from lxml import etree
 from lxml.cssselect import CSSSelector
 import getpass
 import sys
+import os
+import time
 
 BASE_URL = 'https://london.hackspace.org.uk/'
 #BASE_URL = 'http://lhs.samsung/'
@@ -23,7 +25,6 @@ def browse(url, params=None):
 
 find_exception = CSSSelector('.exception')
 
-
 if len(sys.argv) > 1:
   try:
     sys.path.append('RFIDIOt-0.1x') # use local copy for stability
@@ -34,7 +35,7 @@ if len(sys.argv) > 1:
     sys.exit(1)
 
   card = RFIDIOtconfig.card
-  print 'Checking for card...'
+  print 'Checking for card... (scan card on the RFID reader near lovelace)'
 
   while not card.select():
     # Yeah, we really should rewrite RFIDIOt
@@ -42,6 +43,8 @@ if len(sys.argv) > 1:
       raise Exception('Error %s selecting card' % card.errorcode)
 
   uid = card.uid
+  print 'Card.uid is '
+  print card.uid
 
 else:
   uid = raw_input('Card ID: ')
@@ -83,7 +86,7 @@ card_added = browse('/members/addcard.php', {
 
 exc = find_exception(card_added)
 if exc:
-  print 'Could not add card'
+  print 'Could not modify entry'
   print
   print etree.tostring(exc[0], method="text", pretty_print=True)
   sys.exit(1)
