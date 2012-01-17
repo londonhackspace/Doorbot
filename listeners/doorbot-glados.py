@@ -1,15 +1,16 @@
 #!/usr/bin/python
-import sys, os, time, re, socket, urllib2, random, subprocess
-from datetime import datetime
+import os, random, subprocess
+import logging
+import json
 
-sys.path.append('../')
 import DoorbotListener
 
-wavefile = "wavetable.dat"
+cardFile = '../carddb.json'
 
-waves = {}
+mTime = 0
+
+greetings = {}
 randoms = []
-lastmodified = []
 
 random.seed()
 
@@ -19,7 +20,7 @@ def getcmd(sound):
     return 'mpg123 %s' % sound
   else:
     return 'aoss bplay %s '% sound
- 
+
 def playSoundsBackground( sounds):
   cmds = [getcmd(s) for s in sounds]
 
@@ -39,47 +40,53 @@ def playSounds(sounds):
   proc.wait()
 
 
-
 def loadGreetings():
-  f = open(wavefile)
-  regex = re.compile("^([^\s]+)\s*((?:[^\s]| )+)?$")
-  for n, line in enumerate(f):
-    entry, h, comment = line.partition('#')
-    if not entry.strip():
-      continue
-    match = regex.match(entry)
-    if match:
-      id, name = match.groups()
-      waves[id] = name
-      #print id  + " " + name
-    else:
-      print 'Invalid entry at line %d' % n
+  global mTime
+  global greetings
 
-def checkNewGreetings():
   try:
-    stat = os.stat(wavefile)
-    if stat.st_mtime != lastmodified:
-      print "Loading new greetings"
-      loadGreetings()
-      lastmodified = stat.st_mtime
+    currentMtime = os.path.getmtime(cardFile)
+  except IOError, e:
+    logging.critical('Cannot read card file: %s', e)
+    raise
 
-  except Exception, e:
-    print 'Unable to check for new greetings'
+  if mTime != currentMtime:
 
-def loadRandoms ():
-  for f in os.listdir("wavefiles/random"):
+    logging.debug('Loading card table, mtime %d', currentMtime)
+    mTime = currentMtime
+    greetings = {}
+
+    file = open(cardFile)
+
+    users = json.load(file)
+
+    for user in users:
+      if not user['gladosfile']:
+        continue
+
+      for card in user['cards']:
+        card = card.encode('utf-8')
+        greeting = user['gladosfile'].encode('utf-8')
+        greetings[card] = greeting
+
+    logging.info('Loaded %d cards', len(greetings))
+
+
+def loadRandoms():
+  for f in os.listdir("glados-wavefiles/random"):
     randoms.append(f)
 
 
 
 def playGreeting(id):
-  mfolder = "wavefiles/members/"
-  ffolder = "wavefiles/fixed/"
-  
-  if id in waves:
-    
-    sounds = waves[id].split(' ')
+  mfolder = "glados-wavefiles/members/"
+  ffolder = "glados-wavefiles/fixed/"
+
+  if id in greetings:
+
+    sounds = greetings[id].split(' ')
     membersound = sounds[-1]
+    membersound = os.path.basename(membersound)
 
     # FIXME: it seems wrong that these are played before the first one
     if len(sounds) > 1:
@@ -115,16 +122,16 @@ def playGreeting(id):
 
   if random.randint(0,5) == 4:
     playSounds([
-      "wavefiles/random/" + random.choice(randoms),
+      "glados-wavefiles/random/" + random.choice(randoms),
     ])
 
  
  
 def playDenied():
-  playSounds(["wavefiles/fixed/hackspacedenied.wav"])
+  playSounds(["glados-wavefiles/fixed/hackspacedenied.wav"])
 
 def playDoorbell():
-  playSounds(["wavefiles/fixed/hackspacebingbong.wav"])
+  playSounds(["glados-wavefiles/fixed/hackspacebingbong.wav"])
 
 
 class GladosListener(DoorbotListener.DoorbotListener):
@@ -140,7 +147,7 @@ class GladosListener(DoorbotListener.DoorbotListener):
     def doorOpened(self, serial, name):
         print "Door opened"
 
-        checkNewGreetings()
+        loadGreetings()
         try:
             playGreeting(serial)
         except Exception, e:
@@ -159,8 +166,6 @@ class GladosListener(DoorbotListener.DoorbotListener):
 if __name__ == "__main__":
     loadGreetings()
     loadRandoms()
-    lastmodified = os.stat(wavefile).st_mtime
-    print lastmodified
     listener = GladosListener()
     listener.listen()
 
