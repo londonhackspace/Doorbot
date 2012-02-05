@@ -162,6 +162,11 @@ class GladosListener(DoorbotListener.DoorbotListener):
         except Exception:
             pass
 
+    def trigger(self, serial):
+        baseFolder = "glados-wavefiles/"
+        print "Triggering " +  baseFolder + serial
+        playSounds([baseFolder + serial])
+
 
 if __name__ == "__main__":
     loadGreetings()

@@ -29,6 +29,10 @@ class DoorbotListener():
                 elif (event == 'START'):
                     self.startup()
 
+		#for triggering sounds, the "serial" field is just the name of a .wav file
+		elif (event == "TRIGGER"):
+	            self.trigger(serial)
+
             except Exception, e:
                 pass
 
@@ -44,3 +48,7 @@ class DoorbotListener():
 
     def startup(self):
         pass
+
+    def trigger(self, serial):
+        pass
+
