@@ -105,6 +105,11 @@ def checkForSerial(ser):
             ser.write("6"); # Piezo (Sleeps on the arduino for 3s)
             ser.write("3"); # Green off
 
+        #empty buffer
+        while ser.inWaiting() > 0:
+            ser.read(1)
+
+        time.sleep(0.5)
 
 def broadcast(event, card, name):
 
