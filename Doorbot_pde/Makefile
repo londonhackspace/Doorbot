@@ -1,5 +1,5 @@
-# Arduino 0018 Makefile
-# Arduino adaptation by mellis, eighthave, oli.keller
+# Arduino 0021 Makefile
+# Arduino adaptation by mellis, eighthave, oli.keller, pyrou
 #
 # This makefile allows you to build sketches from the command line
 # without the Arduino environment (or Java).
@@ -12,7 +12,7 @@
 #
 #  2. Modify the line containg "INSTALL_DIR" to point to the directory that
 #     contains the Arduino installation (for example, under Mac OS X, this
-#     might be /Applications/arduino-0012).
+#     might be /Applications/Arduino.app).
 #
 #  3. Modify the line containing "PORT" to refer to the filename
 #     representing the USB or serial connection to your Arduino board
@@ -34,19 +34,29 @@
 #
 # $Id$
 
+
+# Default Environment vars
+# can be overridden
+
+ARDUINO_PORT ?= /dev/tty.usb*
+ARDUINO_UPLOAD_RATE ?= 57600
+ARDUINO_AVRDUDE_PROGRAMMER ?= stk500v1
+ARDUINO_MCU ?= atmega328p
+ARDUINO_F_CPU ?= 16000000
+
+
 TARGET = $(notdir $(CURDIR))
-INSTALL_DIR = $(HOME)/arduino-0018
-PORT = /dev/ttyUSB*
-UPLOAD_RATE = 57600
-AVRDUDE_PROGRAMMER = stk500v1
-#MCU = atmega168
-MCU = atmega328p
-F_CPU = 16000000
+INSTALL_DIR = 		$(HOME)/arduino-0021
+UPLOAD_RATE = 		$(ARDUINO_UPLOAD_RATE)
+PORT = 			$(ARDUINO_PORT)
+AVRDUDE_PROGRAMMER = 	$(ARDUINO_AVRDUDE_PROGRAMMER)
+MCU = 			$(ARDUINO_MCU)
+F_CPU = 		$(ARDUINO_F_CPU)
 
 ############################################################################
 # Below here nothing should be changed...
 
-VERSION=18
+VERSION=21
 ARDUINO = $(INSTALL_DIR)/hardware/arduino/cores/arduino
 #AVR_TOOLS_PATH = $(INSTALL_DIR)/hardware/tools/avr/bin
 AVR_TOOLS_PATH = /usr/bin
@@ -66,13 +76,22 @@ $(ARDUINO)/Tone.cpp \
 $(ARDUINO)/main.cpp \
 $(ARDUINO)/WMath.cpp \
 $(ARDUINO)/Print.cpp \
-$(ARDUINO)/HardwareSerial.cpp \
-# end of CXX_MODULES
+$(ARDUINO)/HardwareSerial.cpp
+
+ARDUINO_LIB = \
+$(wildcard $(INSTALL_DIR)/libraries/*/*.c) \
+$(wildcard $(INSTALL_DIR)/libraries/*/*/*.c) \
+$(wildcard $(INSTALL_DIR)/libraries/*/*/*/*.c)
+
+ARDUINO_LIBXX = \
+$(wildcard $(INSTALL_DIR)/libraries/*/*.cpp) \
+$(wildcard $(INSTALL_DIR)/libraries/*/*/*.cpp) \
+$(wildcard $(INSTALL_DIR)/libraries/*/*/*/*.cpp)
 
 CXX_APP = applet/$(TARGET).cpp
-MODULES = $(C_MODULES) $(CXX_MODULES)
-SRC = $(C_MODULES)
-CXXSRC = $(CXX_MODULES) $(CXX_APP)
+MODULES = $(C_MODULES) $(ARDUINO_LIB) $(CXX_MODULES) $(ARDUINO_LIBXX)
+SRC = $(C_MODULES) $(ARDUINO_LIB)
+CXXSRC = $(CXX_MODULES) $(CXX_APP) $(ARDUINO_LIBXX)
 FORMAT = ihex
 
 
@@ -91,9 +110,14 @@ OPT = s
 CDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 CXXDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 
+AVR_HEADERS = $(INSTALL_DIR)/hardware/tools/avr/avr/include/avr
+
+ARDUINO_LIB_INCLUDES = $(addprefix -I, $(dir $(ARDUINO_LIB)))
+ARDUINO_LIBXX_INCLUDES = $(addprefix -I, $(dir $(ARDUINO_LIBXX)))
+
 # Place -I options here
-CINCS = -I$(ARDUINO)
-CXXINCS = -I$(ARDUINO)
+CINCS = -I$(CURDIR) -I$(ARDUINO) $(ARDUINO_LIB_INCLUDES) $(ARDUINO_LIBXX_INCLUDES) -I$(AVR_HEADERS)
+CXXINCS = -I$(CURDIR) -I$(ARDUINO) $(ARDUINO_LIB_INCLUDES) $(ARDUINO_LIBXX_INCLUDES) -I$(AVR_HEADERS)
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
@@ -141,7 +165,7 @@ MV = mv -f
 
 # Define all object files.
 OBJ = $(SRC:.c=.o) $(CXXSRC:.cpp=.o) $(ASRC:.S=.o)
-OBJ_MODULES = $(C_MODULES:.c=.o) $(CXX_MODULES:.cpp=.o)
+OBJ_MODULES = $(C_MODULES:.c=.o) $(CXX_MODULES:.cpp=.o) $(ARDUINO_LIBXX:.cpp=.o)
 
 # Define all listing files.
 LST = $(ASRC:.S=.lst) $(CXXSRC:.cpp=.lst) $(SRC:.c=.lst)
@@ -274,6 +298,4 @@ clean:
 .PHONY:	all build elf hex eep lss sym program coff extcoff clean applet_files sizebefore sizeafter
 
 #include $(SRC:.c=.d)
-#include $(CXXSRC:.cpp=.d) 
-
-
+#include $(CXXSRC:.cpp=.d)
