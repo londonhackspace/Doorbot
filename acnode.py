@@ -265,8 +265,13 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             node = self.urlnode(nodeid)
             access = node.checkCard(uid)
 
-            self.text_ok()
-            self.wfile.write(access)
+            if access:
+                self.text_ok()
+                self.wfile.write(access)
+
+            else:
+                self.text_notfound()
+                self.wfile.write(access)
 
         def do_sync(nodeid, uid=None):
             node = self.urlnode(nodeid)
