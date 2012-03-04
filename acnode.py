@@ -56,6 +56,8 @@ class Node(object):
         for card, userperms in perms.items():
             if self.perm in userperms:
                 self.perms[card] = 1
+            if '%s-maintainer' % self.perm in userperms:
+                self.perms[card] = 2
 
         self.perms.update(self.newperms)
 
