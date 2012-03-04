@@ -312,15 +312,26 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         def do_card(nodeid):
             node = self.urlnode(nodeid)
-            uid = self.content()
+            uids = self.content()
+            m = re.match('^([A-Z0-9]+),([A-Z0-9]+)$', uids)
+            if not m:
+                self.text_bad()
+                return
 
-            access = node.checkCard(uid)
-            if access: 
+            maintainer_uid, user_uid = m.groups()
+            maintainer_access = node.checkCard(maintainer_uid)
+
+            if maintainer_access < 2:
+                self.text_forbidden()
+                return
+
+            user_access = node.checkCard(user_uid)
+            if user_access: # no change
                 self.text_ok()
-                self.wfile.write('OK (was %s)' % access)
+                self.wfile.write('OK (was %s)' % user_access)
 
             else:
-                node.addCard(uid)
+                node.addCard(user_uid)
 
                 self.text_added()
                 self.wfile.write('OK')
