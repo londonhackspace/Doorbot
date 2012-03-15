@@ -376,7 +376,19 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         def do_tooluse(nodeid):
             node = self.urlnode(nodeid)
-            tooluse = self.content()
+            args = self.content()
+            m = re.match('^([0-9]+),([A-Z0-9]+)$', args)
+            if not m:
+                self.text_bad()
+                self.wfile.write('Invalid arguments\n')
+                return
+
+            tooluse, uid = m.groups()
+            access = node.checkCard(uid)
+
+            if not access:
+                self.text_forbidden()
+                return
 
             if tooluse.strip() in ('1', '0'):
                 node.tooluse = int(tooluse)
