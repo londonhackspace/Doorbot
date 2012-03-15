@@ -222,8 +222,11 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def text_notfound(self):
         self.text_response(404)
 
-    def text_notallowed(self):
-        self.text_response(405)
+    def text_badmethod(self, valid_methods):
+        self.send_response(405)
+        self.send_header('Content-type', 'text/plain')
+        self.send_header('Accept', ','.join(valid_methods))
+        self.end_headers()
 
     def text_notacceptable(self):
         self.text_response(406)
@@ -305,7 +308,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_POST(self):
 
         def do_index():
-            self.text_notallowed()
+            self.text_badmethod(['GET'])
 
             self.wfile.write('Path: %s\n' % repr(self.path))
             self.wfile.write('Params: %s\n' % repr(self.params))
@@ -348,7 +351,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_PUT(self):
 
         def do_index():
-            self.text_notallowed()
+            self.text_badmethod(['GET'])
 
             self.wfile.write('Path: %s\n' % repr(self.path))
             self.wfile.write('Params: %s\n' % repr(self.params))
@@ -405,7 +408,7 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             if case.strip() in ('1', '0'):
                 node.case = int(case)
-                self.response_text(200)
+                self.text_ok()
                 self.wfile.write('OK')
 
             else:
