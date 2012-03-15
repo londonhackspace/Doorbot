@@ -150,15 +150,16 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.url = urlparse.urlparse(self.path)
         self.params = urlparse.parse_qs(self.url.query)
 
-        # FIXME: parse properly
-        for t in self.headers['Accept'].split(','):
-            t, _, p = t.partition(';')
-            if 'text/plain' in t or '*/*' in t:
-                break
-        else:
-            html_notacceptable()
-            self.wfile.write('Sorted types: text/plain\n')
-            return
+        if 'Accept' in self.headers:
+            # FIXME: parse properly
+            for t in self.headers['Accept'].split(','):
+                t, _, p = t.partition(';')
+                if 'text/plain' in t or '*/*' in t:
+                    break
+            else:
+                html_notacceptable()
+                self.wfile.write('Sorted types: text/plain\n')
+                return
 
         for pattern, dispatch in dispatches:
             m = re.match(pattern, self.path)
