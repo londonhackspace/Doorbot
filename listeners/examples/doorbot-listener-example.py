@@ -15,8 +15,10 @@ class ExampleListener(DoorbotListener.DoorbotListener):
         print "Door opened by %s, card serial %s." % (name, serial)
 
     def unknownCard(self, serial):
-        print "Unknown card %s presented at the door." %s serial
+        print "Unknown card %s presented at the door." % (serial)
 
+    def trigger(self, filename):
+        print "Audio file [%s] triggered." % (filename)
 
 listener = ExampleListener()
 listener.listen()
