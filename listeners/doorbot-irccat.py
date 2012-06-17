@@ -47,7 +47,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
         else:
             msg = 'DING DONG, DOOR BELL!'
 
-        self.sendMessage(' ',join((
+        self.sendMessage(' '.join((
             msg,
             'http://hack.rs/doorbell.jpg',
             'http://london.hackspace.org.uk/members/webcams.php?camera=3',
