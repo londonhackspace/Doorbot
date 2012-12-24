@@ -43,10 +43,11 @@ def reloadCardTable():
         users = json.load(file)
 
         for user in users:
-            for card in user['cards']:
-              card = card.encode('utf-8')
-              nick = user['nick'].encode('utf-8')
-              cards[card] = nick
+            if user.get('subscribed', True) == True:
+                for card in user['cards']:
+                  card = card.encode('utf-8')
+                  nick = user['nick'].encode('utf-8')
+                  cards[card] = nick
 
         logging.info('Loaded %d cards', len(cards))
 
