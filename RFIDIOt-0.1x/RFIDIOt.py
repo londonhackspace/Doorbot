@@ -99,11 +99,13 @@ class rfidiot:
 					if string.find(self.readername,'SDI010') == 0:
 						self.readersubtype= self.READER_SCM
 					else:
-						if string.find(self.readername,'ACS ACR 38U') == 0:
-						#if string.find(self.readername,'ACS ACR') == 0:
-							self.readersubtype= self.READER_ACS
-							self.pcsc_protocol= smartcard.scard.SCARD_PROTOCOL_T0
+						for n in ['ACS AET65', 'ACS ACR 38U']:
+							if self.readername.startswith(n):
+								self.readersubtype= self.READER_ACS
+								self.pcsc_protocol= smartcard.scard.SCARD_PROTOCOL_T0
+								break
 						else:
+							print 'Reader %s not known, defaulting to Omnikey' % self.readername
 							# default to Omnikey for now
 							self.readersubtype= self.READER_OMNIKEY
 				if DEBUG:
