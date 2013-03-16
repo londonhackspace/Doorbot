@@ -871,10 +871,11 @@ class rfidiot:
 					self.acs_select_tag()
 				else:
 					self.pcsc_send_apdu(self.PCSC_APDU['GUID'])
+
 			except smartcard.Exceptions.NoCardException:
 				self.errorcode= self.PCSC_NO_CARD
 				return False
-			except:
+			except Exception, e:
 				self.errorcode= self.PCSC_COMMS_ERROR
 				return False
 			if self.errorcode == self.ISO_OK:
