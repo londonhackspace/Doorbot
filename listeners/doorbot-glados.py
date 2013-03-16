@@ -26,7 +26,7 @@ def playSoundsBackground( sounds):
 
   # & is for Windows support
   cmdstring = '; '.join(cmds) + ' &'
-  print 'Playing %s' % cmdstring
+  logging.info('Playing %s', cmdstring)
 
   subprocess.Popen(cmdstring, shell=True) 
 
@@ -34,7 +34,7 @@ def playSounds(sounds):
   cmds = [getcmd(s) for s in sounds]
 
   cmdstring = '; '.join(cmds)
-  print 'Playing %s' % cmdstring
+  logging.info('Playing %s', cmdstring)
 
   proc = subprocess.Popen(cmdstring, shell=True)
   proc.wait()
@@ -169,6 +169,7 @@ class GladosListener(DoorbotListener.DoorbotListener):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
     loadGreetings()
     loadRandoms()
     listener = GladosListener()
