@@ -1,4 +1,4 @@
-int triggerPin = D13;
+int triggerPin = D11;
 int ledPin = D12;
 // We're using analogue pins in digital mode.
 int doorBellButton = A0;
