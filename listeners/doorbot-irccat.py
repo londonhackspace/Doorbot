@@ -24,7 +24,7 @@ def untilmsg(until):
         return '%s day%s, %s hour%s' % (days, d_s, hours, h_s)
 
 PICKLEFILE = '/usr/share/irccat/.lastseen.pickle'
-
+location = 'the hackspace door'
 
 class IrccatListener(DoorbotListener.DoorbotListener):
 
@@ -63,18 +63,19 @@ class IrccatListener(DoorbotListener.DoorbotListener):
             d = lastseen[name.lower()]
 
             self.sendMessage(
-                "%s opened the hackspace door. (Last seen %s ago)" % (
+                "%s opened %s. (Last seen %s ago)" % (
                     name,
+                    location,
                     untilmsg(datetime.datetime.now() - d)
                 )
             )
 
         except KeyError:
-            self.sendMessage("%s opened the hackspace door." % name)
+            self.sendMessage("%s opened %s." % (name, location))
 
 
     def unknownCard(self, serial):
-        self.sendMessage("Unknown card presented at the hackspace door.")
+        self.sendMessage("Unknown card presented at %s." % location)
 
     def sendMessage(self, message):
         print message
