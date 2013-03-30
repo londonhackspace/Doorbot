@@ -38,12 +38,12 @@ class Arduino(SerialRelay):
 
         return False
 
-    def flashGreen(self):
+    def flashOK(self):
         self.ser.write("2"); # Green on
         self.ser.write("6"); # Piezo (Sleeps on the arduino for 3s)
         self.ser.write("3"); # Green off
 
-    def flashRed(self):
+    def flashBad(self):
         self.ser.write("4"); # Red on
         self.ser.write("6"); # Piezo (Sleeps on the arduino for 3s)
         self.ser.write("5"); # Red off

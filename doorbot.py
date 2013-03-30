@@ -95,9 +95,9 @@ def checkForCard():
         else:
             logging.warn('%s not authorised', currentCard)
 
-            if hasattr(relay, 'flashRed'):
+            if hasattr(relay, 'flashBad'):
                 logging.debug('Sending unauthorised flash')
-                relay.flashRed()
+                relay.flashBad()
 
             announcer.send('RFID', currentCard, '')
 
@@ -142,8 +142,8 @@ def run():
 
                 if relay.checkBell():
                     announcer.send('BELL', '', '')
-                    if hasattr(relay, 'flashGreen'):
-                        relay.flashGreen()
+                    if hasattr(relay, 'flashOK'):
+                        relay.flashOK()
 
                     # Wait for button to be released
                     time.sleep(0.5)
