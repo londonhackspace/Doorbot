@@ -2,11 +2,11 @@ import select, socket
 
 class DoorbotListener():
 
-    def listen(self):
+    def listen(self, port=50000):
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind(('<broadcast>', 50000))
+        s.bind(('<broadcast>', port))
         s.setblocking(0)
 
         while True:

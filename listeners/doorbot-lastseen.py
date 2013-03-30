@@ -22,5 +22,6 @@ class LastSeenListener(DoorbotListener.DoorbotListener):
         pickle.dump(lastseen, open(PICKLEFILE, 'wb'))
 
 
-listener = LastSeenListener()
-listener.listen()
+if __name__ == '__main__':
+	listener = LastSeenListener()
+	listener.listen()

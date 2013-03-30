@@ -81,12 +81,13 @@ class IrccatListener(DoorbotListener.DoorbotListener):
 
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(5)
             s.connect(('172.31.24.101', 12345))
             s.send(message)
             s.close()
         except Exception, e:
             pass
 
-
-listener = IrccatListener()
-listener.listen()
+if __name__ == '__main__':
+	listener = IrccatListener()
+	listener.listen()
