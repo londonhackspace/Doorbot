@@ -3,7 +3,7 @@ import socket
 
 def listen():
     s = socket.socket()
-    s.bind(('', 50003))
+    s.bind(('', 50001))
     s.listen(1)
 
     while True:
