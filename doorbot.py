@@ -1,8 +1,10 @@
-#!/usr/bin/python
-import sys, os, time, re, socket, serial, urllib2, random
-from datetime import datetime
+#!/usr/bin/env python
+import sys, os, time, serial
+import ConfigParser
 import logging
 import json
+from announcer import *
+from relay import *
 
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
 logging.info('Starting doorbot')
@@ -15,11 +17,24 @@ except Exception, e:
     logging.critical('Error importing RFIDIOt: %s', e)
     sys.exit(1)
 
-cardFile = 'carddb.json'
+config = ConfigParser.ConfigParser()
+config.read((
+    'doorbot.conf',
+    sys.path[0] + '/doorbot.conf',
+    '/etc/doorbot.conf'
+))
+
+cardFile = config.get('doorbot', 'cardfile')
 mTime = 0
 cards = {}
 
 currentCard = ''
+
+def ConfigObject(name):
+    clsname = config.get('doorbot', name)
+    cls = globals()[clsname]
+    params = dict(config.items(clsname))
+    return cls(**params)
 
 
 def reloadCardTable():
@@ -52,7 +67,7 @@ def reloadCardTable():
         logging.info('Loaded %d cards', len(cards))
 
 
-def checkForCard(card, ser):
+def checkForCard():
 
     global currentCard
 
@@ -61,87 +76,55 @@ def checkForCard(card, ser):
         if card.errorcode != card.PCSC_NO_CARD:
             raise Exception('Error %s selecting card' % card.errorcode)
 
-    else:
-        if currentCard == '' or currentCard != card.uid:
-            currentCard = card.uid
-            reloadCardTable()
+        return
 
-            if currentCard in cards:
-                logging.info('%s authorised as %s',
-                    currentCard, cards[currentCard])
+    if currentCard == '' or currentCard != card.uid:
+        currentCard = card.uid
+        reloadCardTable()
 
-                logging.debug('Triggering door relay')
-                ser.write("1");
+        if currentCard in cards:
+            logging.info('%s authorised as %s',
+                currentCard, cards[currentCard])
 
-                logging.debug('Broadcasting to network')
-                broadcast('RFID', currentCard, cards[card.uid])
+            logging.debug('Triggering door relay')
+            relay.openDoor()
 
-            else:
-                logging.warn('%s not authorised', currentCard)
-
-                logging.debug('Sending unauthorised flash')
-                ser.write("4"); # Red on
-                ser.write("6"); # Piezo (Sleeps on the arduino for 3s)
-                ser.write("5"); # Red off
-
-                broadcast('RFID', currentCard, '')
-
-            time.sleep(2) # To avoid read bounces if the card is _just_ in range
+            logging.debug('Announcing to network')
+            announcer.send('RFID', currentCard, cards[card.uid])
 
         else:
-            currentCard = ''
+            logging.warn('%s not authorised', currentCard)
+
+            if hasattr(relay, 'flashRed'):
+                logging.debug('Sending unauthorised flash')
+                relay.flashRed()
+
+            announcer.send('RFID', currentCard, '')
+
+        time.sleep(2) # To avoid read bounces if the card is _just_ in range
+
+    else:
+        currentCard = ''
 
 
-def checkForSerial(ser):
+def run():
+    global card
+    global relay
+    global announcer
 
-    if ser.inWaiting() > 0:
-        line = ser.readline()
-        logging.debug('Response from serial: %s', line)
-
-        if line.startswith("1"):
-            logging.info('Doorbell pressed')
-            broadcast('BELL', '', '')
-
-            ser.write("2"); # Green on
-            ser.write("6"); # Piezo (Sleeps on the arduino for 3s)
-            ser.write("3"); # Green off
-
-        #empty buffer
-        while ser.inWaiting() > 0:
-            ser.read(1)
-
-        time.sleep(0.5)
-
-def broadcast(event, card, name):
-
-    try:
-        logging.debug('Broadcasting %s to network', event)
-
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.bind(('', 0))
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
-        data = "%s\n%s\n%s" % (event, card, name)
-        s.sendto(data, ('<broadcast>', 50000))
-
-    except Exception, e:
-        logging.warn('Exception during broadcast: %s', e)
-
-
-if __name__ == "__main__":
+    announcer = ConfigObject('announcer')
+    relay = ConfigObject('relay')
 
     reloadCardTable()
     logging.info('Announcing start')
-    broadcast('START', '', '')
+    announcer.send('START', '', '')
 
     while True:
-
         logging.debug('Starting main loop')
 
-        ser = None
         try:
             card = RFIDIOtconfig.card
-            ser = serial.Serial("/dev/ttyUSB0", 9600)
+            relay.connect()
 
         except (serial.SerialException, serial.SerialTimeoutException), e:
             logging.warn('Serial error during initialisation: %s', e)
@@ -154,14 +137,21 @@ if __name__ == "__main__":
 
         try:
             while True:
-                checkForCard(card, ser)
+                checkForCard()
                 time.sleep(0.2)
-                checkForSerial(ser)
+
+                if relay.checkBell():
+                    announcer.send('BELL', '', '')
+                    if hasattr(relay, 'flashGreen'):
+                        relay.flashGreen()
+
+                    # Wait for button to be released
+                    time.sleep(0.5)
+
 
         except (serial.SerialException, serial.SerialTimeoutException), e:
             logging.warn('Serial error during poll: %s', e)
-            if ser:
-              ser.close()
+            relay.disconnect()
 
         except Exception, e:
             logging.critical('Unexpected error during poll: %s', e)
@@ -170,3 +160,8 @@ if __name__ == "__main__":
         time.sleep(5)
 
     os._exit(True) # Otherwise RFIDIOt interferes in cleanup
+
+
+if __name__ == "__main__":
+    run()
+
