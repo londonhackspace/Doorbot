@@ -25,18 +25,18 @@ def untilmsg(until):
 
 PICKLEFILE = '/usr/share/irccat/.lastseen.pickle'
 location = 'the hackspace door'
+welcomes = [
+    'This is doorbot and welcome to you who have come to doorbot',
+    'Anything is possible with doorbot',
+    'The infinite is possible with doorbot',
+    'The unattainable is unknown with doorbot',
+    'You can do anything with doorbot',
+]
+welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
 
 class IrccatListener(DoorbotListener.DoorbotListener):
 
     def startup(self):
-        welcomes = [
-            'This is doorbot and welcome to you who have come to doorbot',
-            'Anything is possible with doorbot',
-            'The infinite is possible with doorbot',
-            'The unattainable is unknown with doorbot',
-            'You can do anything with doorbot',
-        ]
-        welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
         self.sendMessage(random.choice(welcomes))
 
     def doorbell(self):
