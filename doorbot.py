@@ -50,7 +50,7 @@ def reloadCardTable():
     if mTime != currentMtime:
 
         logging.debug('Loading card table, mtime %d', currentMtime)
-        mTime = currentMtime
+        mTime = 0
         cards = {}
 
         file = open(cardFile)
@@ -64,6 +64,7 @@ def reloadCardTable():
                   nick = user['nick'].encode('utf-8')
                   cards[card] = nick
 
+        mTime = currentMtime
         logging.info('Loaded %d cards', len(cards))
 
 
