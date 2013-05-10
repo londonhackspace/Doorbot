@@ -6,23 +6,24 @@ import json
 from announcer import *
 from relay import *
 
-logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
-logging.info('Starting doorbot')
-
-try:
-    sys.path.append('RFIDIOt-0.1x') # use local copy for stability
-    import RFIDIOtconfig
-
-except Exception, e:
-    logging.critical('Error importing RFIDIOt: %s', e)
-    sys.exit(1)
-
 config = ConfigParser.ConfigParser()
 config.read((
     'doorbot.conf',
     sys.path[0] + '/doorbot.conf',
     '/etc/doorbot.conf'
 ))
+
+logname = config.get('doorbot', 'logfile')
+logging.basicConfig(filename=logname, format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
+logging.info('Starting doorbot')
+
+try:
+    sys.path.append(sys.path[0] + '/RFIDIOt-0.1x') # use local copy for stability
+    import RFIDIOtconfig
+
+except Exception, e:
+    logging.critical('Error importing RFIDIOt: %s', e)
+    sys.exit(1)
 
 cardFile = config.get('doorbot', 'cardfile')
 mTime = 0

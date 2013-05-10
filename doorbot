@@ -1,0 +1,32 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:    doorbot
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start doorbot
+### END INIT INFO
+
+PROC=/usr/bin/python
+ARGS='/root/Doorbot/doorbot.py -r0'
+PIDFILE=/var/run/doorbot.pid
+
+case "$1" in
+  start)
+    start-stop-daemon --start --pidfile $PIDFILE --exec $PROC --background --make-pidfile -- $ARGS
+  ;;
+  stop)
+    start-stop-daemon --stop --pidfile $PIDFILE --exec $PROC --retry TERM/10/KILL/5 && rm $PIDFILE
+  ;;
+  restart|reload|force-reload)
+    $0 stop
+    $0 start
+  ;;
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 2
+  ;;
+esac
+exit 0
+
