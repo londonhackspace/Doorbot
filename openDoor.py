@@ -13,8 +13,9 @@ print 'Opened. Waiting for reboot...'
 time.sleep(3) # Wait for it to reboot
 
 print 'Opening door...'
-ser.write('1')
+ser.write("\xff\x01\x01")
 time.sleep(0.5)
+ser.write("\xff\x01\x00")
 print 'Response: %s' % ser.readline()
 
 ser.close()
