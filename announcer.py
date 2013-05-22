@@ -1,7 +1,11 @@
 import logging
 import socket
 
-__all__ = ['Broadcast', 'Proxy']
+__all__ = ['Broadcast', 'Proxy', 'Nothing']
+
+class Nothing(object):
+    def send(self, event, card, name):
+        logging.info("event: %s, card: %s, name: %s", event, card, name)
 
 class Broadcast(object):
     def __init__(self, port=50000):
