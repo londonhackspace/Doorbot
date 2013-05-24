@@ -5,7 +5,7 @@ import json
 
 import DoorbotListener
 
-cardFile = '../carddb.json'
+cardFile = '/run/shm/carddb.json'
 
 mTime = 0
 
@@ -17,28 +17,20 @@ random.seed()
 
 def getcmd(sound):
   if sound.endswith('mp3'):
-    return 'mpg123 %s' % sound
+    return ['mpg123', '%s' % sound]
   else:
-    return 'aoss bplay %s '% sound
+    return ['aoss', 'bplay', '%s' % sound]
 
-def playSoundsBackground( sounds):
-  cmds = [getcmd(s) for s in sounds]
-
-  # & is for Windows support
-  cmdstring = '; '.join(cmds) + ' &'
-  logging.info('Playing %s', cmdstring)
-
-  subprocess.Popen(cmdstring, shell=True) 
+def playSoundsBackground(sounds):
+  for s in sounds:
+    logging.info('Playing %s', s)
+    subprocess.call(getcmd(s))
 
 def playSounds(sounds):
-  cmds = [getcmd(s) for s in sounds]
-
-  cmdstring = '; '.join(cmds)
-  logging.info('Playing %s', cmdstring)
-
-  proc = subprocess.Popen(cmdstring, shell=True)
-  proc.wait()
-
+  print sounds
+  for s in sounds:
+    logging.info('Playing %s', s)
+    subprocess.call(getcmd(s))
 
 def loadGreetings():
   global mTime
