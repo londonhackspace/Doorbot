@@ -49,7 +49,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
 
         self.sendMessage(' '.join((
             msg,
-            'http://hack.rs/doorbell.jpg',
+            #'http://hack.rs/doorbell.jpg',
             'http://london.hackspace.org.uk/members/webcams.php?camera=3',
         )))
 
@@ -83,7 +83,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(5)
-            s.connect(('172.31.24.101', 12345))
+            s.connect(('172.31.24.5', 12345))
             s.send(message)
             s.close()
         except Exception, e:
