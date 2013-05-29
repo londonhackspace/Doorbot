@@ -13,7 +13,7 @@ class BoardedListener(DoorbotListener.DoorbotListener):
         self.sendMessage("Unknown card presented at the hackspace door")
 
     def sendMessage(self, message):
-        text = "http://172.31.24.101:8020/%s?restoreAfter=30" % urllib2.quote(message)
+        text = "http://172.31.24.5:8020/%s?restoreAfter=30" % urllib2.quote(message)
         print text
 
         try:

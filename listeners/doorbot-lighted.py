@@ -26,7 +26,7 @@ class LightedListener(DoorbotListener.DoorbotListener):
 
     def flashLights(self, colour, time):
         try:
-            urllib2.urlopen("http://172.31.24.101:8000/_/%s?restoreAfter=%s" % (colour, time))
+            urllib2.urlopen("http://172.31.24.5:8010/_/%s?restoreAfter=%s" % (colour, time))
         except Exception, e:
             pass
         
