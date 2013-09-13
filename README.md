@@ -10,3 +10,10 @@ Prerequisites
  pcsc_scan
 ```
 
+For glados:
+
+```
+apt-get install mpg123 bplay alsa-oss
+```
+
+Then use alsamixer to boost the volume, don't forget to unmute ('m')!
