@@ -19,6 +19,7 @@ class Broadcast(object):
             s.bind(('', 0))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
+            event, card, name = [n.replace('\n', ' ') for n in (event, card, name)]
             data = "%s\n%s\n%s" % (event, card, name)
             s.sendto(data, ('<broadcast>', self.port))
 
@@ -39,6 +40,7 @@ class Proxy(object):
             s.settimeout(5)
             s.connect((self.host, self.port))
 
+            event, card, name = [n.replace('\n', ' ') for n in (event, card, name)]
             data = "%s\n%s\n%s" % (event, card, name)
             s.send(data)
             s.close()
