@@ -2,7 +2,7 @@ import logging
 import time
 import serial
 
-__all__ = ['Arduino', 'KMtronic']
+__all__ = ['Arduino', 'KMtronic', 'NothingRelay']
 
 class SerialRelay(object):
     def __init__(self, port="/dev/ttyUSB0", speed=9600):
@@ -56,5 +56,23 @@ class KMtronic(SerialRelay):
         self.ser.write('\xff\x01\x00')
 
     def checkBell(self):
+        return False
+
+
+class NothingRelay(object):
+    def __init__(self, **kwargs):
+        logging.info("relay: init: %s " % (str(kwargs)))
+
+    def connect(self):
+        logging.info("relay: connect")
+
+    def disconect(self):
+        logging.info("relay: disconnect")
+
+    def openDoor(self):
+        logging.info("relay: open door")
+    
+    def checkBell(self):
+        logging.info("relay: check bell")
         return False
 
