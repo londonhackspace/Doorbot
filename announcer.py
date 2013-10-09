@@ -16,7 +16,7 @@ class Broadcast(object):
             logging.debug('Broadcasting %s to network', event)
 
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.bind(('', 0))
+            s.bind(('<broadcast>', 0))
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             event, card, name = [n.replace('\n', ' ') for n in (event, card, name)]
