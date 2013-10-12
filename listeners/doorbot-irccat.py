@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import DoorbotListener, socket, random, os, pickle, datetime
+import DoorbotListener, socket, random, os, pickle, datetime, unicodedata
 
 def dayordinal(day):
   if 4 <= day <= 20 or 24 <= day <= 30:
@@ -30,9 +30,28 @@ welcomes = [
     'Anything is possible with doorbot',
     'The infinite is possible with doorbot',
     'The unattainable is unknown with doorbot',
-    'You can do anything with doorbot',
 ]
 welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
+
+
+def strip_string(string):
+  """Cleans a string based on a whitelist of printable unicode categories
+ 
+  You can find a full list of categories here:
+  http://www.fileformat.info/info/unicode/category/index.htm
+  """
+  letters     = ('LC', 'Ll', 'Lm', 'Lo', 'Lt', 'Lu')
+  numbers     = ('Nd', 'Nl', 'No')
+  marks       = ('Mc', 'Me', 'Mn')
+  punctuation = ('Pc', 'Pd', 'Pe', 'Pf', 'Pi', 'Po', 'Ps')
+  symbol      = ('Sc', 'Sk', 'Sm', 'So')
+  space       = ('Zs',)
+ 
+  allowed_categories = letters + numbers + marks + punctuation + symbol + space
+ 
+  string = unicode(string)
+  return ''.join([ c for c in string if unicodedata.category(c) in allowed_categories ])
+
 
 class IrccatListener(DoorbotListener.DoorbotListener):
 
@@ -64,7 +83,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
 
             self.sendMessage(
                 "%s opened %s. (Last seen %s ago)" % (
-                    name,
+                    strip_string(name),
                     location,
                     untilmsg(datetime.datetime.now() - d)
                 )
@@ -87,7 +106,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
             s.send(message)
             s.close()
         except Exception, e:
-            pass
+            print 'Exception in main loop: %s' % repr(e)
 
 if __name__ == '__main__':
 	listener = IrccatListener()
