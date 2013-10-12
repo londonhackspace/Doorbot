@@ -34,7 +34,7 @@ while True:
 
     #card.info('readtag v0.1d')
     card.select()
-    if card.uid is not None:
+    if card.uid:
         print '\nID: ' + card.uid
 
 

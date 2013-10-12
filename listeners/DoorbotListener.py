@@ -6,7 +6,8 @@ class DoorbotListener():
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.bind(('<broadcast>', port))
+#        s.bind(('<broadcast>', port))
+        s.bind(('', port))
         s.setblocking(0)
 
         while True:

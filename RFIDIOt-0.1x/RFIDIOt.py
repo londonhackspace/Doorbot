@@ -99,11 +99,9 @@ class rfidiot:
 					if string.find(self.readername,'SDI010') == 0:
 						self.readersubtype= self.READER_SCM
 					else:
-						for n in ['ACS AET65', 'ACS ACR 38U']:
-							if self.readername.startswith(n):
-								self.readersubtype= self.READER_ACS
-								self.pcsc_protocol= smartcard.scard.SCARD_PROTOCOL_T0
-								break
+						if self.readername.startswith('ACS'):
+							self.readersubtype= self.READER_ACS
+							self.pcsc_protocol= smartcard.scard.SCARD_PROTOCOL_T0
 						else:
 							print 'Reader %s not known, defaulting to Omnikey' % self.readername
 							# default to Omnikey for now
@@ -1052,7 +1050,7 @@ class rfidiot:
 			self.data= self.data[6:]
 			self.errorcode= self.ISO_OK
 			return True
-		print "Can't read %s blocks" % self.ACS_TAG_TYPES[self.tagtype]
+		print "Can't read %s blocks" % self.tagtype
 		os._exit(True)
 	def acs_get_sam_serial(self):
 		"ACS get SAM serial"
