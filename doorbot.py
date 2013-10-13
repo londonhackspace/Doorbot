@@ -1,35 +1,10 @@
 #!/usr/bin/env python
-import sys, os, time, serial
-import ConfigParser
-import logging
-import json
+import sys, os, time, serial, ConfigParser, json, logging, daemon
+from logging.handlers import SysLogHandler
+from pidfile import PidFile
 from announcer import *
 from relay import *
 
-config = ConfigParser.ConfigParser()
-config.read((
-    'doorbot.conf',
-    sys.path[0] + '/doorbot.conf',
-    '/etc/doorbot.conf'
-))
-
-logname = config.get('doorbot', 'logfile')
-logging.basicConfig(filename=logname, format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
-logging.info('Starting doorbot')
-
-try:
-    sys.path.append(sys.path[0] + '/RFIDIOt-0.1x') # use local copy for stability
-    import RFIDIOtconfig
-
-except Exception, e:
-    logging.critical('Error importing RFIDIOt: %s', e)
-    sys.exit(1)
-
-cardFile = config.get('doorbot', 'cardfile')
-mTime = 0
-cards = {}
-
-currentCard = ''
 
 def ConfigObject(name):
     clsname = config.get('doorbot', name)
@@ -166,5 +141,38 @@ def run():
 
 
 if __name__ == "__main__":
+    config = ConfigParser.ConfigParser()
+    config.read((
+        'doorbot.conf',
+        sys.path[0] + '/doorbot.conf',
+        '/etc/doorbot.conf'
+        ))
+
+    logfac = config.get('doorbot', 'logfacility')
+    logfac = SysLogHandler.facility_names[logfac]
+    logger = logging.root
+    logger.setLevel(logging.DEBUG)
+    syslog = SysLogHandler(address='/dev/log', facility=logfac)
+    formatter = logging.Formatter('RFM12Pi: %(levelname)-8s %(message)s')
+    syslog.setFormatter(formatter)
+    logger.addHandler(syslog)
+
+    logging.info('Starting doorbot')
+
+    try:
+        sys.path.append(sys.path[0] + '/RFIDIOt-0.1x') # use local copy for stability
+        import RFIDIOtconfig
+
+    except Exception, e:
+        logging.critical('Error importing RFIDIOt: %s', e)
+        sys.exit(1)
+
+    cardFile = config.get('doorbot', 'cardfile')
+    mTime = 0
+    cards = {}
+    currentCard = ''
+
+    d = daemon.DaemonContext(pidfile=PidFile("/var/run/doorbot.pid"))
+    d.open()
     run()
 
