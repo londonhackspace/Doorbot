@@ -8,16 +8,15 @@
 # Short-Description: Start doorbot
 ### END INIT INFO
 
-PROC=/usr/bin/python
-ARGS='/root/Doorbot/doorbot.py -r0'
+PROC='/root/Doorbot/doorbot.py'
 PIDFILE=/var/run/doorbot.pid
 
 case "$1" in
   start)
-    start-stop-daemon --start --pidfile $PIDFILE --exec $PROC --background --make-pidfile -- $ARGS
+    start-stop-daemon --start --chdir /root/Doorbot --pidfile $PIDFILE --exec $PROC
   ;;
   stop)
-    start-stop-daemon --stop --pidfile $PIDFILE --exec $PROC --retry TERM/10/KILL/5 && rm $PIDFILE
+    start-stop-daemon --stop --pidfile $PIDFILE --retry TERM/10/KILL/5
   ;;
   restart|reload|force-reload)
     $0 stop
