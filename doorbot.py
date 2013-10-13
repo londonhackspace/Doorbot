@@ -159,13 +159,6 @@ if __name__ == "__main__":
 
     logging.info('Starting doorbot')
 
-    try:
-        sys.path.append(sys.path[0] + '/RFIDIOt-0.1x') # use local copy for stability
-        import RFIDIOtconfig
-
-    except Exception, e:
-        logging.critical('Error importing RFIDIOt: %s', e)
-        sys.exit(1)
 
     cardFile = config.get('doorbot', 'cardfile')
     mTime = 0
@@ -174,5 +167,14 @@ if __name__ == "__main__":
 
     d = daemon.DaemonContext(pidfile=PidFile("/var/run/doorbot.pid"))
     d.open()
+
+    try:
+        sys.path.append(sys.path[0] + '/RFIDIOt-0.1x') # use local copy for stability
+        import RFIDIOtconfig
+
+    except Exception, e:
+        logging.critical('Error importing RFIDIOt: %s', e)
+        sys.exit(1)
+
     run()
 
