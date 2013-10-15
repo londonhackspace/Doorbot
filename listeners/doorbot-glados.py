@@ -165,5 +165,5 @@ if __name__ == "__main__":
     loadGreetings()
     loadRandoms()
     listener = GladosListener()
-    listener.listen()
+    listener.listen(50002)
 

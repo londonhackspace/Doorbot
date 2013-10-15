@@ -13,7 +13,7 @@ class Broadcast(object):
 
     def send(self, event, card, name):
         try:
-            logging.debug('Broadcasting %s to network', event)
+            logging.debug('Broadcasting %s to network port %d', event, self.port)
 
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.bind(('<broadcast>', 0))
