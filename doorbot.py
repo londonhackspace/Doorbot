@@ -153,7 +153,7 @@ if __name__ == "__main__":
     logger = logging.root
     logger.setLevel(logging.DEBUG)
     syslog = SysLogHandler(address='/dev/log', facility=logfac)
-    formatter = logging.Formatter('RFM12Pi: %(levelname)-8s %(message)s')
+    formatter = logging.Formatter('Doorbot: %(levelname)-8s %(message)s')
     syslog.setFormatter(formatter)
     logger.addHandler(syslog)
 
