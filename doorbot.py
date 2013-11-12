@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, time, serial, ConfigParser, json, logging, daemon
+import sys, os, time, serial, ConfigParser, json, logging, daemon, traceback
 from logging.handlers import SysLogHandler
 from pidfile import PidFile
 from announcer import *
@@ -90,6 +90,7 @@ def run():
     global relay
     global announcer
 
+    logging.info('in run')
     announcer = ConfigObject('announcer')
     relay = ConfigObject('relay')
 
@@ -119,6 +120,7 @@ def run():
                 time.sleep(0.2)
 
                 if relay.checkBell():
+                    logging.info("Doorbell pressed")
                     announcer.send('BELL', '', '')
                     if hasattr(relay, 'flashOK'):
                         relay.flashOK()
@@ -139,7 +141,6 @@ def run():
 
     os._exit(True) # Otherwise RFIDIOt interferes in cleanup
 
-
 if __name__ == "__main__":
     config = ConfigParser.ConfigParser()
     config.read((
@@ -153,28 +154,48 @@ if __name__ == "__main__":
     logger = logging.root
     logger.setLevel(logging.DEBUG)
     syslog = SysLogHandler(address='/dev/log', facility=logfac)
-    formatter = logging.Formatter('Doorbot: %(levelname)-8s %(message)s')
+    formatter = logging.Formatter('Doorbot[%(process)d]: %(levelname)-8s %(message)s')
     syslog.setFormatter(formatter)
     logger.addHandler(syslog)
 
     logging.info('Starting doorbot')
+    logging.info(sys.path[0])
 
+    try:
+        cardFile = config.get('doorbot', 'cardfile')
+        mTime = 0
+        cards = {}
+        currentCard = ''
+    except:
+        logging.exception('importing cards: ')
+        sys.exit(1)
 
-    cardFile = config.get('doorbot', 'cardfile')
-    mTime = 0
-    cards = {}
-    currentCard = ''
+    try:
+        d = daemon.DaemonContext(pidfile=PidFile("/var/run/doorbot.pid"))
+        d.open()
+    except:
+        logging.exception('daemonising: ')
+        sys.exit(1)
 
-    d = daemon.DaemonContext(pidfile=PidFile("/var/run/doorbot.pid"))
-    d.open()
+    logging.info('Daemonised doorbot')
+
+    def my_excepthook(excType, excValue, traceback, logger=logger):
+        logger.error("Logging an uncaught exception",
+            exc_info=(excType, excValue, traceback))
+
+    sys.excepthook = my_excepthook  
 
     try:
         sys.path.append(sys.path[0] + '/RFIDIOt-0.1x') # use local copy for stability
         import RFIDIOtconfig
 
     except Exception, e:
-        logging.critical('Error importing RFIDIOt: %s', e)
+        logging.exception("Error importing RFIDIOt:")
         sys.exit(1)
 
-    run()
+    try:
+        run()
+    except:
+        logging.exception("running: ")
+        sys.exit(1)
 
