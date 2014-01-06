@@ -23,7 +23,7 @@ def browse(url, params=None):
   page = urllib2.urlopen(BASE_URL + url, params)
   return etree.HTML(page.read())
 
-find_exception = CSSSelector('.exception')
+find_exception = CSSSelector('.alert')
 
 if len(sys.argv) > 1:
   try:
