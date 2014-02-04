@@ -135,6 +135,17 @@ def run():
 
         except Exception, e:
             logging.critical('Unexpected error during poll: %s', e)
+            # sometimes the card reader goes away and dosn't come back, if so we
+            # get "Error PC01 selecting card" forever, i don't think we can fix
+            # this from here, so lets just quit
+            
+            # we could send a message to the net that we've failed.
+            # but the announcer api is clunky, i can has json re-write pls?
+            
+            # using this method to quit cos of the message below
+            # no idea if thats a good idea.
+            os._exit(True)
+            
 
         # If it was working, give it some time to settle
         time.sleep(5)
