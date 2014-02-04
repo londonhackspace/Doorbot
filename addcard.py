@@ -23,7 +23,7 @@ def browse(url, params=None):
   page = urllib2.urlopen(BASE_URL + url, params)
   return etree.HTML(page.read())
 
-find_exception = CSSSelector('.exception')
+find_exception = CSSSelector('.alert')
 
 if len(sys.argv) > 1:
   try:
@@ -70,8 +70,8 @@ if exc:
   print etree.tostring(exc[0], method="text", pretty_print=True)
   sys.exit(1)
 
-loggedin_p = logged_in.xpath('//p[@id="loggedin"]')
-if not loggedin_p:
+logout_a = logged_in.xpath('//a[@href="/logout.php"]')
+if not logout_a:
   print 'Could not log in'
   sys.exit(1)
 
