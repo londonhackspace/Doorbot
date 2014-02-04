@@ -26,12 +26,14 @@ class Arduino(SerialRelay):
     def checkBell(self):
         if self.ser.inWaiting() > 0:
             line = self.ser.readline()
-            logging.debug('Response from serial: %s', repr(line))
+            logging.info('Response from serial: %s', repr(line))
 
             # empty buffer
+            tmp = ""
             while self.ser.inWaiting() > 0:
-                self.ser.read(1)
-
+                tmp += self.ser.read(1)
+            
+            logging.info('bits from serial: %s', repr(tmp))
             if line.startswith("1"):
                 logging.info('Doorbell pressed')
                 return True
