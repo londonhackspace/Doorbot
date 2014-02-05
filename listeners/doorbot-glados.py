@@ -15,11 +15,14 @@ randoms = []
 random.seed()
 
 
-def getcmd(sound):
+def getcmd(sound, limited=False):
   if sound.endswith('mp3'):
     return ['mpg123', '%s' % sound]
   else:
-    return ['aoss', 'bplay', '%s' % sound]
+    if limited:
+      return ['timeout', '2s', 'aoss', 'bplay', '%s' % sound]
+    else:
+      return ['aoss', 'bplay', '%s' % sound]
 
 def playSoundsBackground(sounds):
   for s in sounds:
