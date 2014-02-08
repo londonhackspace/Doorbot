@@ -33,7 +33,7 @@ class Arduino(SerialRelay):
             while self.ser.inWaiting() > 0:
                 tmp += self.ser.read(1)
             
-            logging.info('bits from serial: %s', repr(tmp))
+            logging.info('Extra from serial: %s', repr(tmp))
             if line.startswith("1"):
                 logging.info('Doorbell pressed')
                 return True

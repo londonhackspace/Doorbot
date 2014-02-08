@@ -1,9 +1,17 @@
 #!/usr/bin/env python
-import sys, os, time, serial, ConfigParser, json, logging, daemon, traceback
+import sys, os, time, serial, ConfigParser, json, logging
+from daemon import DaemonContext
+import argparse
 from logging.handlers import SysLogHandler
 from pidfile import PidFile
 from announcer import *
 from relay import *
+from RFUID import rfid
+
+# TODO: get rid of some of these globals
+mTime = 0
+currentCard = None
+cards = {}
 
 
 def ConfigObject(name):
@@ -49,60 +57,77 @@ def checkForCard():
 
     global currentCard
 
-    if not card.select():
-        # Yeah, we really should rewrite RFIDIOt
-        if card.errorcode != card.PCSC_NO_CARD:
-            raise Exception('Error %s selecting card' % card.errorcode)
-
+    try:
+        with rfid.Pcsc.reader() as reader:
+            for tag in reader.pn532.scan():
+                uid = tag.uid.upper()
+                break
+    except rfid.NoCardException:
+        currentCard = None
         return
 
-    if currentCard == '' or currentCard != card.uid:
-        currentCard = card.uid
-        reloadCardTable()
+    if currentCard == uid:
+        return
 
-        if currentCard in cards:
-            logging.info('%s authorised as %s',
-                currentCard, cards[currentCard])
+    currentCard = uid
+    reloadCardTable()
 
-            logging.debug('Triggering door relay')
-            relay.openDoor()
+    if currentCard in cards:
+        logging.info('%s authorised as %s',
+            currentCard, cards[currentCard])
 
-            logging.debug('Announcing to network')
-            announcer.send('RFID', currentCard, cards[card.uid])
+        logging.debug('Triggering door relay')
+        relay.openDoor()
 
+        if args.foreground:
+            logging.info('Would announce to network')
         else:
-            logging.warn('%s not authorised', currentCard)
-
-            if hasattr(relay, 'flashBad'):
-                logging.debug('Sending unauthorised flash')
-                relay.flashBad()
-
-            announcer.send('RFID', currentCard, '')
-
-        time.sleep(2) # To avoid read bounces if the card is _just_ in range
+            logging.info('Announcing to network')
+            announcer.send('RFID', currentCard, cards[uid])
 
     else:
-        currentCard = ''
+        logging.warn('%s not authorised', currentCard)
+
+        if hasattr(relay, 'flashBad'):
+            logging.debug('Sending unauthorised flash')
+            relay.flashBad()
+
+        if args.foreground:
+            logging.info('Would announce failure to network')
+        else:
+            logging.info('Announcing failure to network')
+            announcer.send('RFID', currentCard, '')
+
+    time.sleep(2) # To avoid read bounces if the card is _just_ in range
 
 
 def run():
-    global card
     global relay
     global announcer
+    global cardFile
 
-    logging.info('in run')
+    if not args.foreground:
+        daemonise()
+
+    cardFile = config.get('doorbot', 'cardfile')
     announcer = ConfigObject('announcer')
     relay = ConfigObject('relay')
 
     reloadCardTable()
-    logging.info('Announcing start')
-    announcer.send('START', '', '')
+    if args.foreground:
+        logging.info('Would announce start')
+    else:
+        logging.info('Announcing start')
+        announcer.send('START', '', '')
 
     while True:
         logging.debug('Starting main loop')
 
         try:
-            card = RFIDIOtconfig.card
+            # TODO: keep this reader for checkForCard
+            with rfid.Pcsc.reader() as reader:
+                logging.info('PCSC firmware: %s', reader.pn532.firmware())
+
             relay.connect()
 
         except (serial.SerialException, serial.SerialTimeoutException), e:
@@ -121,7 +146,8 @@ def run():
 
                 if relay.checkBell():
                     logging.info("Doorbell pressed")
-                    announcer.send('BELL', '', '')
+                    if not args.foreground:
+                        announcer.send('BELL', '', '')
                     if hasattr(relay, 'flashOK'):
                         relay.flashOK()
 
@@ -150,63 +176,52 @@ def run():
         # If it was working, give it some time to settle
         time.sleep(5)
 
-    os._exit(True) # Otherwise RFIDIOt interferes in cleanup
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--foreground', action='store_true')
+    args = parser.parse_args()
+    return args
 
-if __name__ == "__main__":
+def open_config():
+    global config
     config = ConfigParser.ConfigParser()
     config.read((
         'doorbot.conf',
         sys.path[0] + '/doorbot.conf',
         '/etc/doorbot.conf'
-        ))
+    ))
 
-    logfac = config.get('doorbot', 'logfacility')
-    logfac = SysLogHandler.facility_names[logfac]
-    logger = logging.root
-    logger.setLevel(logging.DEBUG)
-    syslog = SysLogHandler(address='/dev/log', facility=logfac)
-    formatter = logging.Formatter('Doorbot[%(process)d]: %(levelname)-8s %(message)s')
-    syslog.setFormatter(formatter)
-    logger.addHandler(syslog)
+def set_logger():
+    if args.foreground:
+        logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
+    else:
+        logfac = config.get('doorbot', 'logfacility')
+        logfac = SysLogHandler.facility_names[logfac]
+        logger = logging.root
+        logger.setLevel(logging.DEBUG)
+        syslog = SysLogHandler(address='/dev/log', facility=logfac)
+        formatter = logging.Formatter('Doorbot[%(process)d]: %(levelname)-8s %(message)s')
+        syslog.setFormatter(formatter)
+        logger.addHandler(syslog)
 
-    logging.info('Starting doorbot')
-    logging.info(sys.path[0])
-
-    try:
-        cardFile = config.get('doorbot', 'cardfile')
-        mTime = 0
-        cards = {}
-        currentCard = ''
-    except:
-        logging.exception('importing cards: ')
-        sys.exit(1)
-
-    try:
-        d = daemon.DaemonContext(pidfile=PidFile("/var/run/doorbot.pid"))
-        d.open()
-    except:
-        logging.exception('daemonising: ')
-        sys.exit(1)
+def daemonise():
+    daemon = DaemonContext(pidfile=PidFile("/var/run/doorbot.pid"))
+    daemon.open()
 
     logging.info('Daemonised doorbot')
 
-    def my_excepthook(excType, excValue, traceback, logger=logger):
-        logger.error("Logging an uncaught exception",
-            exc_info=(excType, excValue, traceback))
 
-    sys.excepthook = my_excepthook  
+if __name__ == "__main__":
+    args = parse_args()
 
-    try:
-        sys.path.append(sys.path[0] + '/RFIDIOt-0.1x') # use local copy for stability
-        import RFIDIOtconfig
-
-    except Exception, e:
-        logging.exception("Error importing RFIDIOt:")
-        sys.exit(1)
+    open_config()
+    set_logger()
 
     try:
         run()
+    except Exception, e:
+        logging.exception("Exception in main loop")
     except:
-        logging.exception("running: ")
-        sys.exit(1)
+        logging.exception("Non-Exception caught")
+
 
