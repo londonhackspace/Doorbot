@@ -58,6 +58,7 @@ class KMtronic(SerialRelay):
         self.ser.write('\xff\x01\x00')
 
     def checkBell(self):
+        self.ser.write('\xff\x01\x00')
         return False
 
 
