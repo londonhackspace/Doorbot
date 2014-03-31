@@ -1,8 +1,8 @@
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:    doorbot
-# Required-Start:	$network $remote_fs $syslog udev
-# Required-Stop:	$network $remote_fs $syslog udev
+# Required-Start:	$network $remote_fs $syslog udev pcscd
+# Required-Stop:	$network $remote_fs $syslog udev pcscd
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Doorbot
