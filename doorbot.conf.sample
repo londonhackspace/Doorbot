@@ -5,6 +5,7 @@ cardfile = /run/shm/carddb.json
 #announcer = Proxy
 announcer = Nothing
 relay = NothingRelay
+open_duration = 2
 #relay = KMtronic
 
 [Broadcast]

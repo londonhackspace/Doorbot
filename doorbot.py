@@ -56,6 +56,7 @@ def reloadCardTable():
 def checkForCard():
 
     global currentCard
+    global config
 
     try:
         with rfid.Pcsc.reader() as reader:
@@ -77,7 +78,7 @@ def checkForCard():
             currentCard, cards[currentCard])
 
         logging.debug('Triggering door relay')
-        relay.openDoor()
+        relay.openDoor(config.getfloat('doorbot', 'open_duration', 2))
 
         if args.foreground:
             logging.info('Would announce to network')

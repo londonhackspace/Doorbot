@@ -4,6 +4,7 @@ import serial
 
 __all__ = ['Arduino', 'KMtronic', 'NothingRelay']
 
+
 class SerialRelay(object):
     def __init__(self, port="/dev/ttyUSB0", speed=9600):
         self.ser = None
@@ -20,7 +21,7 @@ class SerialRelay(object):
 
 
 class Arduino(SerialRelay):
-    def openDoor(self):
+    def openDoor(self, duration=None):
         self.ser.write('1')
 
     def checkBell(self):
@@ -32,7 +33,7 @@ class Arduino(SerialRelay):
             tmp = ""
             while self.ser.inWaiting() > 0:
                 tmp += self.ser.read(1)
-            
+
             logging.info('Extra from serial: %s', repr(tmp))
             if line.startswith("1"):
                 logging.info('Doorbell pressed')
@@ -52,9 +53,9 @@ class Arduino(SerialRelay):
 
 
 class KMtronic(SerialRelay):
-    def openDoor(self):
+    def openDoor(self, duration=2):
         self.ser.write('\xff\x01\x01')
-        time.sleep(0.5)
+        time.sleep(duration)
         self.ser.write('\xff\x01\x00')
 
     def checkBell(self):
@@ -72,9 +73,9 @@ class NothingRelay(object):
     def disconect(self):
         logging.info("relay: disconnect")
 
-    def openDoor(self):
-        logging.info("relay: open door")
-    
+    def openDoor(self, duration=None):
+        logging.info("relay: open door, duration %s", duration)
+
     def checkBell(self):
         logging.info("relay: check bell")
         return False
