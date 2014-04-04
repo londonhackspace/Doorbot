@@ -78,7 +78,7 @@ def checkForCard():
             currentCard, cards[currentCard])
 
         logging.debug('Triggering door relay')
-        relay.openDoor(config.getfloat('doorbot', 'open_duration', 2))
+        relay.openDoor(config.getfloat('doorbot', 'open_duration'))
 
         if args.foreground:
             logging.info('Would announce to network')
