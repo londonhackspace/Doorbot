@@ -80,8 +80,10 @@ class IrccatListener(DoorbotListener.DoorbotListener):
 
         try:
             d = lastseen[name.lower()]
-
-            self.sendMessage(
+            if name == 'Ragey':
+                self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
+            else:
+                self.sendMessage(
                 "%s opened %s. (Last seen %s ago)" % (
                     strip_string(name),
                     location,
