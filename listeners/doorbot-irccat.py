@@ -49,7 +49,6 @@ def strip_string(string):
  
   allowed_categories = letters + numbers + marks + punctuation + symbol + space
  
-  string = unicode(string)
   return ''.join([ c for c in string if unicodedata.category(c) in allowed_categories ])
 
 
@@ -83,29 +82,29 @@ class IrccatListener(DoorbotListener.DoorbotListener):
             if name == 'Ragey':
                 self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
             else:
-                self.sendMessage(
-                "%s opened %s. (Last seen %s ago)" % (
-                    strip_string(name),
+                self.sendMessage("%s opened %s. (Last seen %s ago)" % (
+                    strip_string(name.decode('utf-8')),
                     location,
-                    untilmsg(datetime.datetime.now() - d)
-                )
-            )
+                    untilmsg(datetime.datetime.now() - d),
+                ))
 
         except KeyError:
             self.sendMessage("%s opened %s." % (name, location))
-
 
     def unknownCard(self, serial):
         self.sendMessage("Unknown card presented at %s." % location)
 
     def sendMessage(self, message):
-        print message
+        if not isinstance(message, unicode):
+            message = message.decode('utf-8')
+
+        print repr(message)
 
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(5)
             s.connect(('172.31.24.5', 12345))
-            s.send(message)
+            s.send(message.encode('utf-8'))
             s.close()
         except Exception, e:
             print 'Exception in main loop: %s' % repr(e)
