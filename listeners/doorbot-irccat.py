@@ -54,6 +54,14 @@ def strip_string(string):
  
   return ''.join([ c for c in string if unicodedata.category(c) in allowed_categories ])
 
+def fix_rtl(string):
+  # If there are any strongly RTL chars, hint that we're always in an LTR context
+  rtl_chars = [c for c in string if unicodedata.bidirectional(c) in ['R', 'AL', 'RLE', 'RLO', 'RLI']]
+  if rtl_chars:
+    return u'\u200e' + string
+
+  return string
+
 
 class IrccatListener(DoorbotListener.DoorbotListener):
 
@@ -81,7 +89,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
             self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
             return
 
-        openedmsg = u'\u200e%s opened %s.' % (
+        openedmsg = '%s opened %s.' % (
             strip_string(name.decode('utf-8')),
             location,
         )
@@ -109,6 +117,7 @@ class IrccatListener(DoorbotListener.DoorbotListener):
         if not isinstance(message, unicode):
             message = message.decode('utf-8')
 
+        message = fix_rtl(message)
         print repr(message)
 
         try:
