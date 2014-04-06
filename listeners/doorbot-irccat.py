@@ -79,17 +79,22 @@ class IrccatListener(DoorbotListener.DoorbotListener):
 
         try:
             d = lastseen[name.lower()]
-            if name == 'Ragey':
-                self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
-            else:
-                self.sendMessage("%s opened %s. (Last seen %s ago)" % (
-                    strip_string(name.decode('utf-8')),
-                    location,
-                    untilmsg(datetime.datetime.now() - d),
-                ))
-
         except KeyError:
-            self.sendMessage("%s opened %s." % (name, location))
+            agomsg = ''
+        else:
+            ago = datetime.datetime.now() - d
+            agomsg = ' (Last seen %s ago)' % untilmsg(ago)
+
+        if name == 'Ragey':
+            self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
+            return
+
+        self.sendMessage(u'\u200e%s opened %s.%s' % (
+            strip_string(name.decode('utf-8')),
+            location,
+            agomsg,
+        ))
+
 
     def unknownCard(self, serial):
         self.sendMessage("Unknown card presented at %s." % location)
