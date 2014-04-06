@@ -25,13 +25,16 @@ def untilmsg(until):
 
 PICKLEFILE = '/usr/share/irccat/.lastseen.pickle'
 location = 'the hackspace door'
+doorbotname = 'doorbot'
+camurl = None
+
 welcomes = [
-    'This is doorbot and welcome to you who have come to doorbot',
-    'Anything is possible with doorbot',
-    'The infinite is possible with doorbot',
-    'The unattainable is unknown with doorbot',
+    'This is %(doorbot)s and welcome to you who have come to %(doorbot)s',
+    'Anything is possible with %(doorbot)s',
+    'The infinite is possible with %(doorbot)s',
+    'The unattainable is unknown with %(doorbot)s',
 ]
-welcomes += ['This is doorbot', 'Welcome to doorbot'] * 10
+welcomes += ['This is %(doorbot)s', 'Welcome to %(doorbot)s'] * 10
 
 
 def strip_string(string):
@@ -55,23 +58,34 @@ def strip_string(string):
 class IrccatListener(DoorbotListener.DoorbotListener):
 
     def startup(self):
-        self.sendMessage(random.choice(welcomes))
+        welcome = random.choice(welcomes) % {'doorbot': doorbotname}
+        self.sendMessage(welcome)
 
     def doorbell(self):
         today = datetime.date.today()
         m, d = today.month, today.day
         if (m, d) >= (12, 24) and (m, d) <= (12, 31):
-            msg = 'DING DONG MERRILY ON HIGH, DOOR BELL!'
+            dingdong = 'DING DONG MERRILY ON HIGH, DOOR BELL!'
         else:
-            msg = 'DING DONG, DOOR BELL!'
+            dingdong = 'DING DONG, DOOR BELL!'
+        msg = [dingdong]
 
-        self.sendMessage(' '.join((
-            msg,
-            #'http://hack.rs/doorbell.jpg',
-            'http://london.hackspace.org.uk/members/webcams.php?camera=3',
-        )))
+        if camurl:
+            msg.append(camurl)
+
+        self.sendMessage(' '.join(msg))
 
     def doorOpened(self, serial, name):
+
+        if name == 'Ragey':
+            self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
+            return
+
+        openedmsg = u'\u200e%s opened %s.' % (
+            strip_string(name.decode('utf-8')),
+            location,
+        )
+        msg = [openedmsg]
 
         lastseen = {}
         if os.path.exists(PICKLEFILE):
@@ -80,20 +94,12 @@ class IrccatListener(DoorbotListener.DoorbotListener):
         try:
             d = lastseen[name.lower()]
         except KeyError:
-            agomsg = ''
+            pass
         else:
             ago = datetime.datetime.now() - d
-            agomsg = ' (Last seen %s ago)' % untilmsg(ago)
+            msg.append('(Last seen %s ago)' % untilmsg(ago))
 
-        if name == 'Ragey':
-            self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
-            return
-
-        self.sendMessage(u'\u200e%s opened %s.%s' % (
-            strip_string(name.decode('utf-8')),
-            location,
-            agomsg,
-        ))
+        self.sendMessage(' '.join(msg))
 
 
     def unknownCard(self, serial):
