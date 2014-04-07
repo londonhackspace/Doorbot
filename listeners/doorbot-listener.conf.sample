@@ -1,0 +1,23 @@
+[default]
+location = the hackspace door
+welcomename = doorbot
+port = 50000
+
+[back]
+location = the hackspace back door
+welcomename = back doorbot
+camurl = https://london.hackspace.org.uk/members/camera.php?id=12
+port = 50000
+
+[front]
+location = the hackspace front door
+welcomename = front doorbot
+camurl = https://london.hackspace.org.uk/members/camera.php?id=14'
+port = 50002
+
+[lastseen]
+picklefile = /usr/share/irccat/.lastseen.pickle
+
+[irccat]
+server = 172.31.24.5
+port = 12345

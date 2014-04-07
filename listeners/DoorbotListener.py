@@ -1,4 +1,5 @@
-import select, socket
+import select, socket, sys
+from ConfigParser import ConfigParser
 
 class DoorbotListener():
 
@@ -52,4 +53,30 @@ class DoorbotListener():
 
     def trigger(self, serial):
         pass
+
+
+
+class Doorbot(object):
+    def __init__(self, params):
+        self.__dict__ = params
+
+config = ConfigParser()
+config.read([
+    'doorbot-listener.conf',
+    sys.path[0] + '/doorbot-listener.conf',
+    '/etc/doorbot-listener.conf',
+])
+
+doorbots = {}
+def get_doorbot(doorbotname):
+    try:
+        doorbot = doorbots[doorbotname]
+    except KeyError:
+        # will raise a NoSectionError if invalid
+        params = dict(config.items(doorbotname))
+        doorbot = Doorbot(params)
+
+        doorbots[doorbotname] = doorbot
+
+    return doorbot
 

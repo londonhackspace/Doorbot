@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-import DoorbotListener, socket, random, os, pickle, datetime, unicodedata
+import socket, pickle
+import os, random
+import datetime
+import unicodedata
+import argparse
+from DoorbotListener import DoorbotListener, get_doorbot, config
 
 def dayordinal(day):
   if 4 <= day <= 20 or 24 <= day <= 30:
@@ -23,19 +28,17 @@ def untilmsg(until):
     else:
         return '%s day%s, %s hour%s' % (days, d_s, hours, h_s)
 
-PICKLEFILE = '/usr/share/irccat/.lastseen.pickle'
-location = 'the hackspace door'
-doorbotname = 'doorbot'
-camurl = None
+def get_welcome(place):
+    welcomes = [
+        'This is %(place)s and welcome to you who have come to %(place)s',
+        'Anything is possible with %(place)s',
+        'The infinite is possible with %(place)s',
+        'The unattainable is unknown with %(place)s',
+    ]
+    welcomes += ['This is %(place)s', 'Welcome to %(place)s'] * 10
 
-welcomes = [
-    'This is %(doorbot)s and welcome to you who have come to %(doorbot)s',
-    'Anything is possible with %(doorbot)s',
-    'The infinite is possible with %(doorbot)s',
-    'The unattainable is unknown with %(doorbot)s',
-]
-welcomes += ['This is %(doorbot)s', 'Welcome to %(doorbot)s'] * 10
-
+    welcome = random.choice(welcomes) % {'place': place}
+    return welcome
 
 def strip_string(string):
   """Cleans a string based on a whitelist of printable unicode categories
@@ -62,12 +65,17 @@ def fix_rtl(string):
 
   return string
 
+def reload_lastseen():
+    global lastseen
+    lastseen = {}
+    lastseenfile = config.get('lastseen', 'picklefile')
+    if os.path.exists(lastseenfile):
+        lastseen = pickle.load(open(lastseenfile))
 
-class IrccatListener(DoorbotListener.DoorbotListener):
 
+class IrccatListener(DoorbotListener):
     def startup(self):
-        welcome = random.choice(welcomes) % {'doorbot': doorbotname}
-        self.sendMessage(welcome)
+        self.sendMessage(get_welcome(this_doorbot.welcomename))
 
     def doorbell(self):
         today = datetime.date.today()
@@ -78,8 +86,9 @@ class IrccatListener(DoorbotListener.DoorbotListener):
             dingdong = 'DING DONG, DOOR BELL!'
         msg = [dingdong]
 
-        if camurl:
-            msg.append(camurl)
+        doorbot = get_doorbot(doorbotname)
+        if hasattr(doorbot, 'camurl'):
+            msg.append(doorbot.camurl)
 
         self.sendMessage(' '.join(msg))
 
@@ -89,16 +98,15 @@ class IrccatListener(DoorbotListener.DoorbotListener):
             self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
             return
 
+        doorbot = get_doorbot(doorbotname)
+
         openedmsg = '%s opened %s.' % (
             strip_string(name.decode('utf-8')),
-            location,
+            doorbot.location,
         )
         msg = [openedmsg]
 
-        lastseen = {}
-        if os.path.exists(PICKLEFILE):
-            lastseen = pickle.load(open(PICKLEFILE))
-
+        reload_lastseen()
         try:
             d = lastseen[name.lower()]
         except KeyError:
@@ -109,9 +117,9 @@ class IrccatListener(DoorbotListener.DoorbotListener):
 
         self.sendMessage(' '.join(msg))
 
-
     def unknownCard(self, serial):
-        self.sendMessage("Unknown card presented at %s." % location)
+        doorbot = get_doorbot(doorbotname)
+        self.sendMessage("Unknown card presented at %s." % doorbot.location)
 
     def sendMessage(self, message):
         if not isinstance(message, unicode):
@@ -123,12 +131,30 @@ class IrccatListener(DoorbotListener.DoorbotListener):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(5)
-            s.connect(('172.31.24.5', 12345))
+            server = config.get('irccat', 'server')
+            port = config.getint('irccat', 'port')
+            s.connect((server, port))
             s.send(message.encode('utf-8'))
             s.close()
         except Exception, e:
             print 'Exception in main loop: %s' % repr(e)
 
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d', '--doorbot', default='default')
+    return parser.parse_args()
+
+
 if __name__ == '__main__':
-	listener = IrccatListener()
-	listener.listen()
+
+    args = parse_args()
+
+    # Once we start broadcasting the doorbot ID, we can just replace
+    # this_doorbot.blah with a literal, or use default for now
+    doorbotname = args.doorbot
+    this_doorbot = get_doorbot(doorbotname)
+
+    listener = IrccatListener()
+    listener.listen(int(this_doorbot.port))
+
