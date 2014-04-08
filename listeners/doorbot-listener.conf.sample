@@ -12,7 +12,7 @@ port = 50000
 [front]
 location = the hackspace front door
 welcomename = front doorbot
-camurl = http://hack.rs/c/14'
+camurl = http://hack.rs/c/14
 port = 50002
 
 [lastseen]
