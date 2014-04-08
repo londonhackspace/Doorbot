@@ -119,7 +119,13 @@ class IrccatListener(DoorbotListener):
 
     def unknownCard(self, serial):
         doorbot = get_doorbot(doorbotname)
-        self.sendMessage("Unknown card presented at %s." % doorbot.location)
+        unknown_msg = "Unknown card presented at %s." % doorbot.location
+        msg = [unknown_msg]
+
+        if hasattr(doorbot, 'camurl'):
+            msg.append(doorbot.camurl)
+
+        self.sendMessage(' '.join(msg))
 
     def sendMessage(self, message):
         if not isinstance(message, unicode):
