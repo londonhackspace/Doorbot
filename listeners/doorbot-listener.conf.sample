@@ -1,0 +1,23 @@
+[default]
+location = the hackspace door
+welcomename = doorbot
+port = 50000
+
+[back]
+location = the hackspace back door
+welcomename = back doorbot
+camurl = http://hack.rs/c/12
+port = 50000
+
+[front]
+location = the hackspace front door
+welcomename = front doorbot
+camurl = http://hack.rs/c/14
+port = 50002
+
+[lastseen]
+picklefile = /usr/share/irccat/.lastseen.pickle
+
+[irccat]
+server = 172.31.24.5
+port = 12345
