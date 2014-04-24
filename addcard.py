@@ -23,7 +23,7 @@ def browse(url, params=None):
     page = urllib2.urlopen(BASE_URL + url, params)
     return etree.HTML(page.read())
 
-find_exception = CSSSelector('.alert')
+find_exception = CSSSelector('.alert-danger')
 
 if len(sys.argv) > 1:
     print 'Checking for card... (scan card on the RFID reader attached to this computer)'
