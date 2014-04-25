@@ -61,9 +61,9 @@ logged_in = browse('login.php', {
 
 exc = find_exception(logged_in)
 if exc:
-    print 'Could not authenticate'
+    print 'Could not authenticate:'
     print
-    print etree.tostring(exc[0], method="text", pretty_print=True)
+    print etree.tostring(exc[0], method="text", encoding='utf-8', pretty_print=True)
     sys.exit(1)
 
 logout_a = logged_in.xpath('//a[@href="/logout.php"]')
@@ -82,9 +82,9 @@ card_added = browse('/members/addcard.php', {
 
 exc = find_exception(card_added)
 if exc:
-    print 'Could not modify entry'
+    print 'Could not modify entry:'
     print
-    print etree.tostring(exc[0], method="text", pretty_print=True)
+    print etree.tostring(exc[0], method="text", encoding='utf-8', pretty_print=True)
     sys.exit(1)
 
 print "Card %s successfully added" % uid
