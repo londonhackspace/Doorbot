@@ -1,17 +1,10 @@
 #!/usr/bin/env python
 import sys, os, time, serial, ConfigParser, json, logging
-from daemon import DaemonContext
 import argparse
 from logging.handlers import SysLogHandler
-from pidfile import PidFile
 from announcer import *
 from relay import *
 from RFUID import rfid
-
-# TODO: get rid of some of these globals
-mTime = 0
-currentCard = None
-cards = {}
 
 
 def ConfigObject(name):
@@ -21,161 +14,154 @@ def ConfigObject(name):
     return cls(**params)
 
 
-def reloadCardTable():
-    global mTime
-    global cards
+class Doorbot(object):
+    def __init__(self):
+        self.mTime = 0
+        self.lastCard = None
+        self.cards = {}
+        self.cardFile = config.get('doorbot', 'cardfile')
+        self.relay = ConfigObject('relay')
+        self.announcer = ConfigObject('announcer')
+        self.reader = None
 
-    try:
-        currentMtime = os.path.getmtime(cardFile)
-    except IOError, e:
-        logging.critical('Cannot read card file: %s', e)
-        raise
+    def reload_cards(self):
+        try:
+            currentMtime = os.path.getmtime(self.cardFile)
+        except IOError, e:
+            logging.critical('Cannot read card file: %s', e)
+            raise
 
-    if mTime != currentMtime:
+        if self.mTime != currentMtime:
 
-        logging.debug('Loading card table, mtime %d', currentMtime)
-        mTime = 0
-        newCards = {}
+            logging.debug('Loading card table, mtime %d', currentMtime)
+            self.mTime = 0
+            newCards = {}
 
-        file = open(cardFile)
+            with open(self.cardFile) as f:
+                users = json.load(f)
 
-        users = json.load(file)
+            for user in users:
+                if user.get('subscribed', True) == True:
+                    for card in user['cards']:
+                      card = card.encode('utf-8')
+                      nick = user['nick'].encode('utf-8')
+                      newCards[card] = nick
 
-        for user in users:
-            if user.get('subscribed', True) == True:
-                for card in user['cards']:
-                  card = card.encode('utf-8')
-                  nick = user['nick'].encode('utf-8')
-                  newCards[card] = nick
+            self.cards = newCards
+            self.mTime = currentMtime
+            logging.info('Loaded %d cards', len(self.cards))
 
-        cards = newCards
-        mTime = currentMtime
-        logging.info('Loaded %d cards', len(cards))
-
-
-def checkForCard():
-
-    global currentCard
-    global config
-
-    try:
-        with rfid.Pcsc.reader() as reader:
-            for tag in reader.pn532.scan():
+    def check_card(self):
+        try:
+            for tag in self.reader.pn532.scan():
                 uid = tag.uid.upper()
-                break
-    except rfid.NoCardException:
-        currentCard = None
-        return
+                if self.lastCard == uid:
+                    return
+                self.on_card(uid)
+                self.lastCard = uid
 
-    if currentCard == uid:
-        return
+        except rfid.NoCardException:
+            self.lastCard = None
+            return
 
-    currentCard = uid
-    reloadCardTable()
+    def on_card(self, uid):
+        self.reload_cards()
 
-    if currentCard in cards:
-        logging.info('%s authorised as %s',
-            currentCard, cards[currentCard])
+        try:
+            person = self.cards[uid]
+            logging.info('%s authorised as %s', uid, person)
 
-        logging.debug('Triggering door relay')
-        relay.openDoor(config.getfloat('doorbot', 'open_duration'))
+            logging.debug('Triggering door relay')
+            self.relay.openDoor(config.getfloat('doorbot', 'open_duration'))
 
+            if args.foreground:
+                logging.info('Would announce to network')
+            else:
+                logging.info('Announcing to network')
+                self.announcer.send('RFID', uid, person)
+
+        except KeyError, e:
+            logging.warn('%s not authorised', uid)
+
+            if hasattr(self.relay, 'flashBad'):
+                logging.debug('Sending unauthorised flash')
+                self.relay.flashBad()
+
+            if args.foreground:
+                logging.info('Would announce failure to network')
+            else:
+                logging.info('Announcing failure to network')
+                self.announcer.send('RFID', uid, '')
+
+        logging.debug('Sleeping to avoid bounce')
+        time.sleep(2) # To avoid read bounces if the card is _just_ in range
+
+
+    def run(self):
+        self.reload_cards()
         if args.foreground:
-            logging.info('Would announce to network')
+            logging.info('Would announce start')
         else:
-            logging.info('Announcing to network')
-            announcer.send('RFID', currentCard, cards[uid])
+            logging.info('Announcing start')
+            self.announcer.send('START', '', '')
 
-    else:
-        logging.warn('%s not authorised', currentCard)
+        logging.debug('Starting outer loop')
+        # If the reader or relay disappears temporarily, we can recover safely
+        while True:
+            try:
+                self.reader = rfid.Pcsc.reader()
+                self.reader.open()
+                logging.info('PCSC firmware: %s', self.reader.pn532.firmware())
+                self.relay.connect()
 
-        if hasattr(relay, 'flashBad'):
-            logging.debug('Sending unauthorised flash')
-            relay.flashBad()
+            except Exception, e:
+                logging.critical('Error during initialisation: %s', e)
+                raise
 
-        if args.foreground:
-            logging.info('Would announce failure to network')
-        else:
-            logging.info('Announcing failure to network')
-            announcer.send('RFID', currentCard, '')
+            else:
+                self.main_loop()
 
-    time.sleep(2) # To avoid read bounces if the card is _just_ in range
+                # If it was working, give it some time to settle
+                time.sleep(5)
 
+            finally:
+                self.relay.disconnect()
+                self.reader.close()
 
-def run():
-    global relay
-    global announcer
-    global cardFile
-
-    if not args.foreground:
-        daemonise()
-
-    cardFile = config.get('doorbot', 'cardfile')
-    announcer = ConfigObject('announcer')
-    relay = ConfigObject('relay')
-
-    reloadCardTable()
-    if args.foreground:
-        logging.info('Would announce start')
-    else:
-        logging.info('Announcing start')
-        announcer.send('START', '', '')
-
-    while True:
+    def main_loop(self):
         logging.debug('Starting main loop')
-
-        try:
-            # TODO: keep this reader for checkForCard
-            with rfid.Pcsc.reader() as reader:
-                logging.info('PCSC firmware: %s', reader.pn532.firmware())
-
-            relay.connect()
-
-        except (serial.SerialException, serial.SerialTimeoutException), e:
-            logging.warn('Serial error during initialisation: %s', e)
-            break
-
-        except Exception, e:
-            logging.critical('Unexpected error during initialisation: %s', e)
-            break
-
-
-        try:
-            while True:
-                checkForCard()
+        while True:
+            try:
+                self.check_card()
                 time.sleep(0.2)
 
-                if relay.checkBell():
+                if self.relay.checkBell():
                     logging.info("Doorbell pressed")
+
                     if not args.foreground:
-                        announcer.send('BELL', '', '')
-                    if hasattr(relay, 'flashOK'):
-                        relay.flashOK()
+                        self.announcer.send('BELL', '', '')
+                    if hasattr(self.relay, 'flashOK'):
+                        self.relay.flashOK()
 
                     # Wait for button to be released
                     time.sleep(0.5)
 
 
-        except (serial.SerialException, serial.SerialTimeoutException), e:
-            logging.warn('Serial error during poll: %s', e)
-            relay.disconnect()
+            except (serial.SerialException, serial.SerialTimeoutException), e:
+                logging.warn('Serial error during poll: %s', e)
+                return
 
-        except Exception, e:
-            logging.critical('Unexpected error during poll: %s', e)
-            # sometimes the card reader goes away and dosn't come back, if so we
-            # get "Error PC01 selecting card" forever, i don't think we can fix
-            # this from here, so lets just quit
-            
-            # we could send a message to the net that we've failed.
-            # but the announcer api is clunky, i can has json re-write pls?
-            
-            # using this method to quit cos of the message below
-            # no idea if thats a good idea.
-            os._exit(True)
-            
+            except Exception, e:
+                logging.critical('Unexpected error during poll: %s', e)
+                # sometimes the card reader goes away and dosn't come back, if so we
+                # get "Error PC01 selecting card" forever, i don't think we can fix
+                # this from here, so lets just quit
 
-        # If it was working, give it some time to settle
-        time.sleep(5)
+                # we could send a message to the net that we've failed.
+                # but the announcer api is clunky, i can has json re-write pls?
+                raise
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -206,6 +192,8 @@ def set_logger():
         logger.addHandler(syslog)
 
 def daemonise():
+    from daemon import DaemonContext
+    from pidfile import PidFile
     daemon = DaemonContext(pidfile=PidFile("/var/run/doorbot.pid"))
     daemon.open()
 
@@ -218,10 +206,16 @@ if __name__ == "__main__":
     open_config()
     set_logger()
 
+    if not args.foreground:
+        daemonise()
+
+    doorbot = Doorbot()
     try:
-        run()
+        doorbot.run()
+
+    # Top-level handlers because we're daemonised
     except Exception, e:
-        logging.exception("Exception in main loop")
+        logging.exception("Exception in main loop: %s" % e)
     except:
         logging.exception("Non-Exception caught")
 

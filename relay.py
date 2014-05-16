@@ -65,18 +65,18 @@ class KMtronic(SerialRelay):
 
 class NothingRelay(object):
     def __init__(self, **kwargs):
-        logging.info("relay: init: %s " % (str(kwargs)))
+        logging.debug("relay: init: %s " % (str(kwargs)))
 
     def connect(self):
-        logging.info("relay: connect")
+        logging.debug("relay: connect")
 
-    def disconect(self):
-        logging.info("relay: disconnect")
+    def disconnect(self):
+        logging.debug("relay: disconnect")
 
     def openDoor(self, duration=None):
-        logging.info("relay: open door, duration %s", duration)
+        logging.debug("relay: open door, duration %s", duration)
 
     def checkBell(self):
-        logging.info("relay: check bell")
+        logging.debug("relay: check bell")
         return False
 
