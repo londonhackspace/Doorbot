@@ -70,6 +70,7 @@ class Doorbot(object):
         try:
             person = self.cards[uid]
             logging.info('%s authorised as %s', uid, person)
+            self.reader.green_on()
 
             logging.debug('Triggering door relay')
             self.relay.openDoor(config.getfloat('doorbot', 'open_duration'))
@@ -82,6 +83,7 @@ class Doorbot(object):
 
         except KeyError, e:
             logging.warn('%s not authorised', uid)
+            self.reader.red_on()
 
             if hasattr(self.relay, 'flashBad'):
                 logging.debug('Sending unauthorised flash')
@@ -134,9 +136,11 @@ class Doorbot(object):
             try:
                 self.check_card()
                 time.sleep(0.2)
+                self.reader.leds_off()
 
                 if self.relay.checkBell():
                     logging.info("Doorbell pressed")
+                    self.relay.red_on()
 
                     if not args.foreground:
                         self.announcer.send('BELL', '', '')
