@@ -135,8 +135,8 @@ class Doorbot(object):
         while True:
             try:
                 self.check_card()
-                time.sleep(0.2)
                 self.reader.leds_off()
+                time.sleep(0.2)
 
                 if self.relay.checkBell():
                     logging.info("Doorbell pressed")
