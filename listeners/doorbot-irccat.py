@@ -115,7 +115,9 @@ class IrccatListener(DoorbotListener):
             ago = datetime.datetime.now() - d
             msg.append('(Last seen %s ago)' % untilmsg(ago))
 
-        self.sendMessage(' '.join(msg))
+        # avoid reporting multiple door opening attempts by puny visitors
+        if ago.seconds > 30 or ago.days > 0:
+            self.sendMessage(' '.join(msg))
 
     def unknownCard(self, serial):
         doorbot = get_doorbot(doorbotname)
