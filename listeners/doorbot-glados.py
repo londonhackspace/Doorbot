@@ -16,10 +16,7 @@ random.seed()
 
 
 def getcmd(sound):
-  if sound.endswith('mp3'):
-    return ['mpg123', '%s' % sound]
-  else:
-    return ['aoss', 'bplay', '%s' % sound]
+  return ['play', '-q', '--norm', str(sound), 'trim', '0', '00:10']
 
 def playSoundsBackground(sounds):
   for s in sounds:
