@@ -16,6 +16,7 @@ random.seed()
 
 
 def getcmd(sound):
+  # apt-get install sox for this command
   return ['play', '-q', '--norm', str(sound), 'trim', '0', '00:10']
 
 def playSoundsBackground(sounds):
