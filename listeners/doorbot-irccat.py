@@ -113,7 +113,8 @@ class IrccatListener(DoorbotListener):
             pass
         else:
             ago = datetime.datetime.now() - d
-            msg.append('(Last seen %s ago)' % untilmsg(ago))
+            if ago > datetime.timedelta(0, 60):
+              msg.append('(Last seen %s ago)' % untilmsg(ago))
 
         self.sendMessage(' '.join(msg))
 
