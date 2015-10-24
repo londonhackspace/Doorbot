@@ -43,7 +43,7 @@ class Doorbot(object):
             for user in users:
                 if user.get('subscribed', True) == True:
                     for card in user['cards']:
-                      card = card.encode('utf-8')
+                      card = card.encode('utf-8').upper()
                       nick = user['nick'].encode('utf-8')
                       newCards[card] = nick
 
