@@ -1,7 +1,10 @@
 import select, socket, sys
 from ConfigParser import ConfigParser
+from carddb import CardDB
 
 class DoorbotListener():
+    def __init__(self):
+        self.carddb = CardDB()
 
     def listen(self, port=50000):
 
@@ -17,13 +20,14 @@ class DoorbotListener():
 
                 result = select.select([s],[],[])
                 payload = result[0][0].recv(1024)
-                (event, serial, name) = payload.split("\n")
+                (event, serial, _) = payload.split("\n")
 
-                if (event == 'RFID' and name):
-                    self.doorOpened(serial, name)
-
-                elif (event == 'RFID' and not name):
-                    self.unknownCard(serial)
+                if event == 'RFID':
+                    name = self.carddb.nickForCard(serial)
+                    if name:
+                        self.doorOpened(serial, name)
+                    else:
+                        self.unknownCard(serial)
 
                 elif (event == 'BELL'):
                     self.doorbell()

@@ -113,11 +113,15 @@ class IrccatListener(DoorbotListener):
             pass
         else:
             ago = datetime.datetime.now() - d
-            msg.append('(Last seen %s ago)' % untilmsg(ago))
+            if ago > datetime.timedelta(0, 60):
+              msg.append('(Last seen %s ago)' % untilmsg(ago))
 
         self.sendMessage(' '.join(msg))
 
     def unknownCard(self, serial):
+
+	print 'Unknown card: %s' % serial
+
         doorbot = get_doorbot(doorbotname)
         unknown_msg = "Unknown card presented at %s." % doorbot.location
         msg = [unknown_msg]

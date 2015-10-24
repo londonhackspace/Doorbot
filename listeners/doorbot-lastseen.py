@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import DoorbotListener, os, pickle, datetime, time
-
-PICKLEFILE = '/usr/share/irccat/.lastseen.pickle'
+from DoorbotListener import config
 
 class LastSeenListener(DoorbotListener.DoorbotListener):
 
@@ -14,12 +13,14 @@ class LastSeenListener(DoorbotListener.DoorbotListener):
 
         lastseen = {}
 
-        if os.path.exists(PICKLEFILE):
-            lastseen = pickle.load(open(PICKLEFILE))
+        picklefile = config.get('lastseen', 'picklefile')
+
+        if os.path.exists(picklefile):
+            lastseen = pickle.load(open(picklefile))
 
         lastseen[name.lower()] = datetime.datetime.now()
 
-        pickle.dump(lastseen, open(PICKLEFILE, 'wb'))
+        pickle.dump(lastseen, open(picklefile, 'wb'))
 
 
 if __name__ == '__main__':
