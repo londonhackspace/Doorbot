@@ -119,6 +119,9 @@ class IrccatListener(DoorbotListener):
         self.sendMessage(' '.join(msg))
 
     def unknownCard(self, serial):
+
+	print 'Unknown card: %s' % serial
+
         doorbot = get_doorbot(doorbotname)
         unknown_msg = "Unknown card presented at %s." % doorbot.location
         msg = [unknown_msg]
