@@ -124,7 +124,7 @@ class IrccatListener(DoorbotListener):
 
         doorbot = get_doorbot(doorbotname)
         unknown_msg = "Unknown card presented at %s." % doorbot.location
-        msg = [unknown_msg]
+        msg = ['#london-hack-space-dev', unknown_msg]
 
         if hasattr(doorbot, 'camurl'):
             msg.append(doorbot.camurl)
