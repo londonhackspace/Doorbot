@@ -6,7 +6,6 @@
 # symlink traversal attack?
 #
 
-cd /root/Doorbot
 curl -s -S -kf -o carddb.json.download --compressed https://london.hackspace.org.uk/carddb.php > getcards.err 2>&1
 
 if [ $? -eq 0 ] ; then
