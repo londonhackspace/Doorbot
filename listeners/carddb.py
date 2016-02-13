@@ -1,7 +1,7 @@
 import json, time, os.path
 
 class CardDB:
-    def __init__(self, filename="/root/Doorbot/carddb.json"):
+    def __init__(self, filename):
         self.filename = filename
         self.lastModified = time.ctime(os.path.getmtime(filename))
         self.db = json.load(open(filename, "r"))

@@ -4,7 +4,7 @@ from carddb import CardDB
 
 class DoorbotListener():
     def __init__(self):
-        self.carddb = CardDB()
+        self.carddb = CardDB(dict(config.items('default'))['carddb'])
 
     def listen(self, port=50000):
 
