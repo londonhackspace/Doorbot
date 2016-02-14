@@ -6,7 +6,7 @@
 # symlink traversal attack?
 #
 
-curl -s -S -kf -o carddb.json.download --compressed https://london.hackspace.org.uk/carddb.php > getcards.err 2>&1
+curl -6 -s -S -kf -o carddb.json.download --compressed https://london.hackspace.org.uk/carddb.php > getcards.err 2>&1
 
 if [ $? -eq 0 ] ; then
 	mv carddb.json.download carddb.json
