@@ -1,9 +1,9 @@
-import json, time, os.path
+import json, os.path
 
 class CardDB:
     def __init__(self, filename):
         self.filename = filename
-        self.lastModified = time.ctime(os.path.getmtime(filename))
+        self.lastModified = os.path.getmtime(filename)
         self.db = json.load(open(filename, "r"))
 
     def nickForCard(self, card_serial):
@@ -14,7 +14,7 @@ class CardDB:
         return None
 
     def maybeRefresh(self):
-        timestamp = time.ctime(os.path.getmtime(self.filename))
+        timestamp = os.path.getmtime(self.filename)
         if timestamp > self.lastModified:
             print 'refreshing'
             self.lastModified = timestamp
