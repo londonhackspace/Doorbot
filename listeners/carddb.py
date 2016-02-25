@@ -9,7 +9,7 @@ class CardDB:
     def nickForCard(self, card_serial):
         self.maybeRefresh()
         for entry in self.db:
-            if card_serial in entry['cards']:
+            if card_serial in entry['cards'] and entry['subscribed'] == True:
                 return entry['nick']
         return None
 
