@@ -2,6 +2,7 @@
 import socket, pickle
 import os, random
 import datetime
+import time
 import unicodedata
 import argparse
 from DoorbotListener import DoorbotListener, get_doorbot, config
@@ -74,6 +75,11 @@ def reload_lastseen():
 
 
 class IrccatListener(DoorbotListener):
+    def __init__(self):
+        DoorbotListener.__init__(self)
+        self.lastMessage = None
+        self.dupeMessages = 0
+
     def startup(self):
         self.sendMessage(get_welcome(this_doorbot.welcomename))
 
@@ -120,7 +126,7 @@ class IrccatListener(DoorbotListener):
 
     def unknownCard(self, serial):
 
-	print 'Unknown card: %s' % serial
+        print 'Unknown card: %s' % serial
 
         doorbot = get_doorbot(doorbotname)
         unknown_msg = "Unknown card presented at %s." % doorbot.location
@@ -135,7 +141,20 @@ class IrccatListener(DoorbotListener):
         if not isinstance(message, unicode):
             message = message.decode('utf-8')
 
-        print repr(message)
+        print '%s %r' % (time.strftime('%Y-%m-%d %H:%M:%S'), message)
+        if message == self.lastMessage:
+            if time.time() - self.lastTime < 5:
+                print 'Suppressing duplicate message'
+                self.dupeMessages += 1
+                return
+            elif self.dupeMessages > 1:
+                message = '%s (repeated %s times)' % (message, self.dupeMessages)
+
+        # Otherwise, drop any outstanding dupes for now
+
+        self.lastMessage = message
+        self.lastTime = time.time()
+        self.dupeMessages = 0
 
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
