@@ -107,7 +107,7 @@ class IrccatListener(DoorbotListener):
         doorbot = get_doorbot(doorbotname)
 
         openedmsg = u'%s opened %s.' % (
-            fix_rtl(strip_string(name.decode('utf-8'))),
+            fix_rtl(strip_string(name)),
             doorbot.location,
         )
         msg = [openedmsg]
