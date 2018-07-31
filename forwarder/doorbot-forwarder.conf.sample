@@ -1,0 +1,16 @@
+[default]
+listen_lan = 10.0.40.0/23
+ports = 50000,50001,50002,50003,50004,50005
+
+[servers]
+interface = 10.0.20.30
+
+[wifi-anon]
+interface = 10.0.50.30
+
+[wifi-auth]
+interface = 10.0.60.30
+
+[sockets]
+interface = 10.0.70.30
+

@@ -1,0 +1,13 @@
+[Unit]
+Description=Doorbot Forwarder
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/doorbot-forwarder/doorbot-forwarder.py
+User=doorbot-forwarder
+Group=doorbot-forwarder
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
