@@ -1,0 +1,12 @@
+[forward]
+50000 = door1
+50001 = door2
+50003 = door3
+50004 = door4
+
+[reverse]
+door1 = 50000
+door2 = 50001
+door3 = 50002
+door4 = 50004
+door5 = 50005

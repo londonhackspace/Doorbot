@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /opt/doorbot-forwarder/doorbot-forwarder.py
+ExecStart=/usr/bin/stdbuf -oL /usr/bin/python3 /opt/doorbot-forwarder/doorbot-forwarder.py
 User=doorbot-forwarder
 Group=doorbot-forwarder
 Restart=always
