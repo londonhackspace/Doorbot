@@ -24,7 +24,8 @@ class DoorbotForwarder:
                 mqtt_server,
                 mqtt_topic,
                 mqtt_forward_map,
-                mqtt_reverse_map):
+                mqtt_reverse_map,
+                acserver_lookup):
         self.listen_lan = ipaddress.ip_network(listen_lan)
         self.sendinterfaces = sendinterfaces
         self.ports = ports
@@ -41,6 +42,8 @@ class DoorbotForwarder:
         self.mqtt_client = mqtt.Client(userdata=self)
         self.mqtt_client.on_connect = on_mqtt_connect
         self.mqtt_client.on_message = on_mqtt_message
+
+        self.acserver_lookup = acserver_lookup
 
     def _mqtt_connect(self, client, flags, rc):
         self.mqtt_client.subscribe(self.mqtt_topic)
@@ -60,13 +63,28 @@ class DoorbotForwarder:
             return
         port = self.mqtt_reverse_map[doorname]
         card = ""
+        user = ""
         if "Card" in json_msg:
             card = json_msg["Card"]
-        payload = (json_msg["Type"] + "\n" + card + "\n").encode("utf-8")
+            if 'Name' in json_msg:
+                user = json_msg['Name']
+            else:
+                user = self.acserver_lookup.lookup_name(card)
+        payload = (json_msg["Type"] + "\n" + card + "\n"+user).encode("utf-8")
         self._send_payload(payload, port, True)
 
+    def _enhance_payload(self,payload):
+        payload_2 = payload
+
+        parts = payload.decode("utf-8").split('\n')
+        if parts[0] == 'RFID' and len(parts[2]) == 0:
+            name = self.acserver_lookup.lookup_name(parts[1])
+            if len(name) > 0:
+                payload_2 = (parts[0] + "\n" + parts[1] + "\n"+name).encode("utf-8")
+        return payload_2
 
     def _send_payload(self, payload, port, from_mqtt = False):
+        payload = self._enhance_payload(payload)
         for interface, skt in self.send_sockets.items():
             print("Rebroadcasting on %s:%d" % (interface, port))
             skt.sendto(payload, ('255.255.255.255', port))
@@ -82,6 +100,7 @@ class DoorbotForwarder:
             if parts[0] == 'RFID':
                 topic = topic_prefix + "/announcements"
                 msg["Card"] = parts[1]
+                msg["Name"] = parts[2]
             elif parts[0] == 'START':
                 topic = topic_prefix + "/status"
             elif parts[0] == 'BELL':

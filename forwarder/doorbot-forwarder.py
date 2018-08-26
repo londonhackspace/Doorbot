@@ -2,6 +2,8 @@ import configparser
 import DoorbotForwarder
 import sys
 
+from ACServerLookup import ACServerLookup
+
 listen_lan = None
 send_interfaces = []
 ports = []
@@ -46,5 +48,7 @@ forwarder = DoorbotForwarder.DoorbotForwarder(listen_lan,
                                                 mqtt_server,
                                                 mqtt_topic,
                                                 mqtt_forward_map,
-                                                mqtt_reverse_map)
+                                                mqtt_reverse_map,
+                                                ACServerLookup(config['default']['acserver'],
+                                                    config['default']['acserver_api_secret']))
 forwarder.start()
