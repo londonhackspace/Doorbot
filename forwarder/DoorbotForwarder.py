@@ -73,10 +73,23 @@ class DoorbotForwarder:
         
         if not from_mqtt:
             parts = payload.decode("utf-8").split('\n')
-            msg = { "Type" : parts[0], "Card" : parts[1], "Source" : "Bridge" }
+            msg = { "Type" : parts[0], "Source" : "Bridge" }
             if len(parts[2]) > 0:
                 msg["Name"] = parts[2]
-            topic = "/door/" + self.mqtt_forward_map[port] + "/status"
+
+            topic_prefix = "/door/" + self.mqtt_forward_map[port]
+
+            if parts[0] == 'RFID':
+                topic = topic_prefix + "/announcements"
+                msg["Card"] = parts[1]
+            elif parts[0] == 'START':
+                topic = topic_prefix + "/status"
+            elif parts[0] == 'BELL':
+                topic = topic_prefix + "/bell"
+                msg["Message"] = "RINGGGGGG!!!!!!"
+            else:
+                print("Unknown announcement type " + parts[0])
+ 
             self.mqtt_client.publish(topic, json.dumps(msg))
 
     def _handle_woken_socket(self, woken_socket):

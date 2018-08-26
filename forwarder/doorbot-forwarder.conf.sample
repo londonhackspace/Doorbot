@@ -1,7 +1,7 @@
 [default]
 listen_lan = 10.0.40.0/23
 ports = 50000,50001,50002,50003,50004,50005
-mqtt_topic = /door/+/status
+mqtt_topic = /door/#
 mqtt_server = mqtt.lan.london.hackspace.org.uk
 
 [servers]
