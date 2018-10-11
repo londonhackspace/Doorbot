@@ -5,7 +5,7 @@ import json
 
 import DoorbotListener
 
-cardFile = '/run/shm/carddb.json'
+cardFile = '/srv/doorbot/carddb.json'
 
 mTime = 0
 
@@ -18,7 +18,7 @@ random.seed()
 def getcmd(sound):
   # Prerequisites for this command:
   # sudo apt-get install sox libsox-fmt-mp3
-  return ['play', '-q', '--norm', str(sound), 'trim', '0', '00:10']
+  return ['play', '-q', '--norm', str(sound), 'trim', '0', '00:12']
 
 def playSoundsBackground(sounds):
   for s in sounds:
@@ -164,5 +164,5 @@ if __name__ == "__main__":
     loadGreetings()
     loadRandoms()
     listener = GladosListener()
-    listener.listen(50002)
+    listener.listen(50003)
 
