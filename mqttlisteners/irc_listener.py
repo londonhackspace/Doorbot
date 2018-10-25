@@ -141,5 +141,4 @@ class IRCDoorbotListener(MQTTDoorbotListener):
 
 if __name__ == '__main__':
     dbl = IRCDoorbotListener()
-    #dbl.run()
-    dbl.on_card("1234", "mich181189", dbl.config['test-door'])
+    dbl.run()

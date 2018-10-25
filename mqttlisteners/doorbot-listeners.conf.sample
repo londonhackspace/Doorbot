@@ -12,10 +12,6 @@ irccat_port = 12345
 [lastseen]
 picklefile = lastseen.pickle
 
-[test-door]
-name = a testing imaginary door
-announce = true
-
 [gf-back]
 name = the Hackspace Back Door
 announce = true

@@ -24,5 +24,5 @@ class LastSeenListener(MQTTDoorbotListener):
 
 if __name__ == '__main__':
     listener = LastSeenListener()
-    #listener.run()
-    listener.on_card("1234", "mich181189", listener.config['1f-entrance'])
+    listener.run()
+
