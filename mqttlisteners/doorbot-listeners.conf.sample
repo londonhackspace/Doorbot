@@ -1,0 +1,49 @@
+[default]
+mqtt_server = mqtt.lan.london.hackspace.org.uk
+acserver = https://acserver.lan.london.hackspace.org.uk
+acserver_api_secret = <secret>
+mqtt_topic = /door/#
+
+[irc]
+topic = #london-hack-space
+irccat = chomsky.lan.london.hackspace.org.uk
+irccat_port = 12345
+
+[lastseen]
+picklefile = lastseen.pickle
+
+[test-door]
+name = a testing imaginary door
+announce = true
+
+[gf-back]
+name = the Hackspace Back Door
+announce = true
+
+[1f-entrance]
+name = the Hackspace First Floor Door
+announce = true
+
+[gf-front-inner]
+name = the Hackspace Ground Floor Front Door
+announce = true
+
+[gf-front-external]
+name = the Building's Front Door
+announce = true
+
+[1f-electronics-lab]
+name = the Electronics Lab Door
+announce = false
+
+[1f-funk]
+name = the Radio Lair Door
+announce = false
+
+[gf-biolab]
+name = the Biolab Door
+announce = false
+
+[gf-backgate]
+name = the Back Gate
+announce = false
