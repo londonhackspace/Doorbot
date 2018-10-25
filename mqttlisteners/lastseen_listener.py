@@ -15,7 +15,7 @@ class LastSeenListener(MQTTDoorbotListener):
         picklefile = self.config.get('lastseen', 'picklefile')
 
         if os.path.exists(picklefile):
-            lastseen = pickle.load(open(picklefile))
+            lastseen = pickle.load(open(picklefile,'rb'))
 
         lastseen[name.lower()] = datetime.datetime.now()
 
