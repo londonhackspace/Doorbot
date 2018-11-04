@@ -1,5 +1,6 @@
 from MQTTDoorbotListener import MQTTDoorbotListener
 import time
+import datetime
 import urllib
 
 class SignsDoorbotListener(MQTTDoorbotListener):
@@ -18,13 +19,13 @@ class SignsDoorbotListener(MQTTDoorbotListener):
             dingdong = 'DING DONG MERRILY ON HIGH, DOOR BELL!'
         else:
             dingdong = 'DING DONG, DOOR BELL!'
-        self.send_message("%s: %s" % (door['name'], dingdong))
+        self.send_message("%s (%s)" % (dingdong, door['name']))
 
     def send_message(self, message):
         print('%s %s' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
         for board in self.config['default']['boards'].split(','):
             board = self.config[board.strip()]
-            url = "http://%s:%d/%s?restoreafter=%d" % \
+            url = "http://%s:%d/%s?restoreAfter=%d" % \
                         (board['host'], int(board['port']), urllib.request.quote(message), int(board['restoreafter']))
             print("Connecting to %s" %  (url,))
             try:
