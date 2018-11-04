@@ -73,7 +73,13 @@ class IRCDoorbotListener(MQTTDoorbotListener):
         if not door.getboolean('announce', True):
             return
 
-        msg = "%s opened %s" % (fix_rtl(strip_string(name)), door['name'])
+        if name == 'Ragey':
+            self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
+            return
+        elif name == 'Inspector Sands':
+            msg = "%s attended to %s" % (fix_rtl(strip_string(name)), door['name'])
+        else:
+            msg = "%s opened %s" % (fix_rtl(strip_string(name)), door['name'])
 
         lastseen = {}
 

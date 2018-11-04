@@ -9,7 +9,11 @@ class SignsDoorbotListener(MQTTDoorbotListener):
         if not door.getboolean('announce', True):
             print("Ignorning non-annoucing door %s" % (door['name'],))
             return
-        msg = "%s opened %s" % (name, door['name'])
+        if name == 'Inspector Sands':
+            msg = "%s attended to %s" % (name, door['name'])
+        else:
+            msg = "%s opened %s" % (name, door['name'])
+
         self.send_message(msg)
 
     def on_bell(self, door):
