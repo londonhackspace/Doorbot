@@ -18,7 +18,7 @@ random.seed()
 def getcmd(sound):
   # Prerequisites for this command:
   # sudo apt-get install sox libsox-fmt-mp3
-  return ['play', '-q', '--norm', str(sound), 'trim', '0', '00:12']
+  return ['play', '-q', '--norm', str(sound), 'trim', '0', '00:17']
 
 def playSoundsBackground(sounds):
   for s in sounds:
