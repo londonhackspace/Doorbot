@@ -59,15 +59,23 @@ class MQTTDoorbotListener():
         payload = json.loads(msg.payload.decode("utf-8"))
         if payload['Type'] == "RFID":
             card = payload['Card']
-            if 'Name' in payload:
-                user = payload['Name']
-            else:
-                user = self.acserver.lookup_name(card)
+            (user,subscribed) = self.acserver.lookup_name(card)
             # if the card now has a name, it's valid. Otherwise, it's unknown
-            if len(user) > 0:
-                self.on_card(card, user, door)
+
+            if 'Granted' in payload: 
+                if int(payload['Granted']) == 1:
+                    self.on_card(card, user, door)
+                else:
+                    if len(user) == 0:
+                        self.on_unknown_card(card, door, user)
+                    else:
+                        self.on_denied(card, user, door)
             else:
-                self.on_unknown_card(card, door)
+                if len(user) > 0:
+                    self.on_card(card, user, door)
+                elif not subscribed:
+                    self.on_unknown_card(card, door, user)
+                
         elif payload['Type'] == "START":
             self.on_start(door)
         elif payload['Type'] == "ALIVE":
@@ -84,7 +92,10 @@ class MQTTDoorbotListener():
     def on_card(self, card_id, name, door):
         pass
 
-    def on_unknown_card(self, card_id, door):
+    def on_denied(self, card_id, name, door):
+        pass
+
+    def on_unknown_card(self, card_id, door, user):
         pass
 
     def on_start(self, door):

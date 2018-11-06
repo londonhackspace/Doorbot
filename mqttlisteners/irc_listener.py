@@ -77,7 +77,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
             self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
             return
         elif name == 'Inspector Sands':
-            msg = "%s attended to %s" % (fix_rtl(strip_string(name)), door['name'])
+            msg = "%s reported to %s" % (fix_rtl(strip_string(name)), door['name'])
         else:
             msg = "%s opened %s" % (fix_rtl(strip_string(name)), door['name'])
 
@@ -108,6 +108,9 @@ class IRCDoorbotListener(MQTTDoorbotListener):
 
     def on_alive(self, door):
         pass
+
+    def on_denied(self, card_id, name, door):
+        self.send_message("denied access to user at door %s" % (door['name'],))
 
     def on_bell(self, door):
         today = datetime.date.today()

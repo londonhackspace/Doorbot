@@ -23,6 +23,9 @@ class TestListener(MQTTDoorbotListener):
     def on_exit(self, door):
         print("Exit button pressed on %s" % (door['name'],))
 
+    def on_denied(self, card_id, name, door):
+        print("%s denied access with card %s at door %s" % (name, card_id, door['name']))
+
 dbl = TestListener()
 
 dbl.run()

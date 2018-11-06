@@ -10,11 +10,12 @@ class ACServerLookup:
         headers = { 'API-KEY' : self.api_secret }
         try:
             r = requests.get("%s/api/get_user_name/%s" % (self.acserver, card_id), headers=headers)
+            print("Got %s" % (r.text,))
             result = r.json()
             if 'error' in r.json():
                 print("Warning: Error returned from acserver")
-                return ""
-            return result['user_name']
-        except ex:
-            print("Got exception while trying to get name")
-            return ""
+                return ("", False)
+            return (result['user_name'],result['subscribed'])
+        except Exception as e:
+            print("Got exception while trying to get name: %s" % (repr(e),))
+            return ("", False)

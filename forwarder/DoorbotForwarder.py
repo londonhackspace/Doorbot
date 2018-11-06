@@ -50,6 +50,9 @@ class DoorbotForwarder:
 
     def _mqtt_message(self, client, msg):
         print("MQTT Message: " + str(msg.payload))
+        if len(msg.payload.decode("utf-8")) == 0:
+            print("Empty message!")
+            return
         json_msg = json.loads(msg.payload.decode("utf-8"))
         if json_msg['Source'] == "Bridge":
             print("Ignoring a message of our own")
@@ -69,7 +72,9 @@ class DoorbotForwarder:
             if 'Name' in json_msg:
                 user = json_msg['Name']
             else:
-                user = self.acserver_lookup.lookup_name(card)
+                (user,subscribed) = self.acserver_lookup.lookup_name(card)
+                if not subscribed:
+                    user = ""
         payload = (json_msg["Type"] + "\n" + card + "\n"+user).encode("utf-8")
         self._send_payload(payload, port, True)
 
