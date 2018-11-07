@@ -122,6 +122,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
         self.send_message("%s: %s" % (door['name'], dingdong))
 
     def send_message(self, message):
+        message = self.topic + " " + message
         print('%s %r' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
         if message == self.lastMessage:
             if time.time() - self.lastTime < 5:

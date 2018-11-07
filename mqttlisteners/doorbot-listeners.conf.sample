@@ -6,13 +6,18 @@ mqtt_topic = /door/#
 boards = 1f-board
 
 [irc]
-topic = #london-hack-space
+topic = #london-hack-space-bots
 irccat = chomsky.lan.london.hackspace.org.uk
 irccat_port = 12345
 
 [1f-board]
 host = wilson.lan.london.hackspace.org.uk
 port = 8020
+restoreafter = 30
+
+[holonyak]
+host = holonyak.lan.london.hackspace.org.uk
+port = 8021
 restoreafter = 30
 
 [lastseen]
