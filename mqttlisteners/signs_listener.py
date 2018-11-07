@@ -1,7 +1,17 @@
 from MQTTDoorbotListener import MQTTDoorbotListener
 import time
 import datetime
-import urllib
+import concurrent.futures
+import urllib.request
+import requests
+
+pool = concurrent.futures.ProcessPoolExecutor()
+
+def doIt(url):
+    try:
+        requests.get(url)
+    except Exception as e:
+                print("Error connecting to %s: %s" % (url, str(e)))
 
 class SignsDoorbotListener(MQTTDoorbotListener):
 
@@ -10,7 +20,7 @@ class SignsDoorbotListener(MQTTDoorbotListener):
             print("Ignorning non-annoucing door %s" % (door['name'],))
             return
         if name == 'Inspector Sands':
-            msg = "%s attended to %s" % (name, door['name'])
+            msg = "%s reported to %s" % (name, door['name'])
         else:
             msg = "%s opened %s" % (name, door['name'])
 
@@ -32,10 +42,9 @@ class SignsDoorbotListener(MQTTDoorbotListener):
             url = "http://%s:%d/%s?restoreAfter=%d" % \
                         (board['host'], int(board['port']), urllib.request.quote(message), int(board['restoreafter']))
             print("Connecting to %s" %  (url,))
-            try:
-                urllib.request.urlopen(url)
-            except Exception as e:
-                print("Error connecting to %s: %s" % (board['host'], str(e)))
+
+            
+            pool.submit(doIt, url)
 
 
 if __name__ == '__main__':
