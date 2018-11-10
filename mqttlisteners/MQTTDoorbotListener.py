@@ -59,12 +59,12 @@ class MQTTDoorbotListener():
         payload = json.loads(msg.payload.decode("utf-8"))
         if payload['Type'] == "RFID":
             card = payload['Card']
-            (user,subscribed) = self.acserver.lookup_name(card)
+            (user,subscribed,gladosfile) = self.acserver.lookup_name(card)
             # if the card now has a name, it's valid. Otherwise, it's unknown
 
             if 'Granted' in payload: 
                 if int(payload['Granted']) == 1:
-                    self.on_card(card, user, door)
+                    self.on_card(card, user, door, gladosfile)
                 else:
                     if len(user) == 0:
                         self.on_unknown_card(card, door, user)
@@ -72,7 +72,7 @@ class MQTTDoorbotListener():
                         self.on_denied(card, user, door)
             else:
                 if len(user) > 0:
-                    self.on_card(card, user, door)
+                    self.on_card(card, user, door, gladosfile)
                 elif not subscribed:
                     self.on_unknown_card(card, door, user)
                 
@@ -89,7 +89,7 @@ class MQTTDoorbotListener():
 
     # Implement any of these in your subclass. 
     # Door will be the config object
-    def on_card(self, card_id, name, door):
+    def on_card(self, card_id, name, door, gladosfile):
         pass
 
     def on_denied(self, card_id, name, door):
