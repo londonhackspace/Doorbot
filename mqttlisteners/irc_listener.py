@@ -97,7 +97,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
             if ago > datetime.timedelta(0, 60):
               msg = '%s (Last seen %s ago)' % (msg, untilmsg(ago))
             # also announce to the summary channel if ago is longer than an hour ao
-            if ago > if ago > datetime.timedelta(0, 3600):
+            if ago > datetime.timedelta(0, 3600):
                 summary = True
 
         if name == 'Ragey':
