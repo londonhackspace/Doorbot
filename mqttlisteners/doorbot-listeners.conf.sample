@@ -7,6 +7,7 @@ boards = 1f-board
 
 [irc]
 topic = #london-hack-space-bots
+summary_topic = #london-hack-space
 irccat = chomsky.lan.london.hackspace.org.uk
 irccat_port = 12345
 

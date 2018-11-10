@@ -66,6 +66,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
     def __init__(self):
         super().__init__()
         self.topic = self.config['irc']['topic']
+        self.summary_topic = self.config['irc']['summary_topic']
         self.lastMessage = None
         self.dupeMessages = 0
 
@@ -73,9 +74,6 @@ class IRCDoorbotListener(MQTTDoorbotListener):
         if not door.getboolean('announce', True):
             return
 
-        if name == 'Ragey':
-            self.sendMessage("RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW")
-            return
         elif name == 'Inspector Sands':
             msg = "%s reported to %s" % (fix_rtl(strip_string(name)), door['name'])
         else:
@@ -88,6 +86,8 @@ class IRCDoorbotListener(MQTTDoorbotListener):
         if os.path.exists(picklefile):
             lastseen = pickle.load(open(picklefile, 'rb'))
 
+        summary = False
+
         try:
             d = lastseen[name.lower()]
         except KeyError:
@@ -96,8 +96,14 @@ class IRCDoorbotListener(MQTTDoorbotListener):
             ago = datetime.datetime.now() - d
             if ago > datetime.timedelta(0, 60):
               msg = '%s (Last seen %s ago)' % (msg, untilmsg(ago))
+            # also announce to the summary channel if ago is longer than an hour ao
+            if ago > if ago > datetime.timedelta(0, 3600):
+                summary = True
 
-        self.send_message(msg)
+        if name == 'Ragey':
+            msg = "RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW"
+
+        self.send_message(msg, summary)
 
 
     def on_unknown_card(self, card_id, door):
@@ -119,10 +125,16 @@ class IRCDoorbotListener(MQTTDoorbotListener):
             dingdong = 'DING DONG MERRILY ON HIGH, DOOR BELL!'
         else:
             dingdong = 'DING DONG, DOOR BELL!'
-        self.send_message("%s: %s" % (door['name'], dingdong))
+        self.send_message("%s: %s" % (door['name'], dingdong), True)
 
-    def send_message(self, message):
-        message = self.topic + " " + message
+    def send_message(self, message, summary=False):
+        # add the channel name to the start
+        if summary:
+            # every summary message becomes a normal message as well
+            self.send_message(message, False)
+            message = self.summary_topic + " " + message
+        else:
+            message = self.topic + " " + message
         print('%s %r' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
         if message == self.lastMessage:
             if time.time() - self.lastTime < 5:
