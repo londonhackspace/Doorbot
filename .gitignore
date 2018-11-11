@@ -5,3 +5,5 @@ listeners/glados-wavefiles/*
 listeners/doorbot-listener.conf
 carddb.json
 doorbot.conf
+mqttlisteners/venv
+mqttlisteners/lastseen.pickle
