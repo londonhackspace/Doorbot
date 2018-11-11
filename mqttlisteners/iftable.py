@@ -12,7 +12,8 @@ def get_iftable(host, community):
         # output[1] is stderr
         logging.error("snmptable failed: %s" % (output[1]))
         return None
-    output = output[0].split("\n")
+    output = output[0].decode("ascii")
+    output = output.split("\n")
     output = output[2:]
     header = output[0]
     header = header.split(',')

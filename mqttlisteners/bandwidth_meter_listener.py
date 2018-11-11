@@ -19,7 +19,7 @@ class BmeterDoorbotListener(MQTTDoorbotListener):
         super().__init__()
         self.queue = queue
 
-    def on_card(self, card_id, name, door):
+    def on_card(self, card_id, name, door, gladosfile):
         if not door.getboolean('announce', True):
             return
 
