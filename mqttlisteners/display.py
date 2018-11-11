@@ -15,11 +15,12 @@ class display:
   def reinit(self):
     pass
 
-  def send(self,thing):
+  def send(self, thing):
     ok = False
     try:
       f = urllib.request.urlopen(self.host + thing)
       ret = f.read()
+      ret = ret.decode("ascii")
       if ret != "Ok":
         self.l.error(self.host + thing + " -> " + ret)
       ok = True

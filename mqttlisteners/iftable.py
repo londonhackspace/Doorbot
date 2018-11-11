@@ -5,7 +5,7 @@
 import subprocess, sys, logging
 
 def get_iftable(host, community):
-    cmd = "snmptable -Cf ,  -c " + community + " -v 2c -M /var/lib/mibs/ietf:/var/lib/mibs/iana -m IF-MIB " + host + "  ifTable"
+    cmd = "snmptable -Cf ,  -c " + community + " -v 2c -M /var/lib/snmp/mibs/ietf/:/var/lib/snmp/mibs/iana/ -m IF-MIB " + host + "  ifTable"
     cmd = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = cmd.communicate()
     if cmd.returncode != 0:
@@ -42,7 +42,7 @@ def get_speeds_snmp(host, ifname = 'ppp0', community = 'public'):
         if table[idx]['ifType'] == 'ethernetCsmacd' or table[idx]['ifType'] == 'ppp':
             if table[idx]['ifDescr'] == ifname:
                 inoct = int(table[idx]['ifInOctets'])
-                outoct = int(table[idx]['ifOutOctets'])                
+                outoct = int(table[idx]['ifOutOctets'])
     return (inoct, outoct)
 
 if __name__ == "__main__":
