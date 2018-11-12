@@ -14,7 +14,7 @@ class ACServerLookup:
             result = r.json()
             if 'error' in r.json():
                 print("Warning: Error returned from acserver")
-                return ("", False)
+                return ("", False, False)
             return (result['user_name'],result['subscribed'], result['gladosfile'])
         except Exception as e:
             print("Got exception while trying to get name: %s" % (repr(e),))

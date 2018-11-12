@@ -42,7 +42,7 @@ class GladosListener(MQTTDoorbotListener):
         else:
             print("Will not announce stuff at %s" % (door['name'],))
 
-    def on_unknown_card(self, card_id, door):
+    def on_unknown_card(self, card_id, door, user):
         print("unknown card %s presented at door %s" % (card_id, door['name']))
         self.playSounds(["glados-wavefiles/fixed/GlaDOS_intrusion_detected_Silent_alarm_.wav"])
 
