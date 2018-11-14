@@ -15,7 +15,7 @@ def doIt(url):
 
 class SignsDoorbotListener(MQTTDoorbotListener):
 
-    def on_card(self, card_id, name, door):
+    def on_card(self, card_id, name, door, gladosfile):
         if not door.getboolean('announce', True):
             print("Ignorning non-annoucing door %s" % (door['name'],))
             return

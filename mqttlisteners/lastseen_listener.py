@@ -3,7 +3,7 @@ from MQTTDoorbotListener import MQTTDoorbotListener
 
 class LastSeenListener(MQTTDoorbotListener):
 
-    def on_card(self, card_id, name, door):
+    def on_card(self, card_id, name, door, gladosfile):
 
         # To stop a race condition between us and the irc announce bot
         time.sleep(2)

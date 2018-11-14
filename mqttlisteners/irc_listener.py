@@ -70,7 +70,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
         self.lastMessage = None
         self.dupeMessages = 0
 
-    def on_card(self, card_id, name, door):
+    def on_card(self, card_id, name, door, gladosfile):
         if not door.getboolean('announce', True):
             return
 
