@@ -76,6 +76,8 @@ class IRCDoorbotListener(MQTTDoorbotListener):
 
         if name == 'Inspector Sands':
             msg = "%s reported to %s" % (fix_rtl(strip_string(name)), door['name'])
+        elif name == 'Cepmender the great!':
+            msg = "%s paraded through %s" % (fix_rtl(strip_string(name)), door['name'])
         else:
             msg = "%s opened %s" % (fix_rtl(strip_string(name)), door['name'])
 
