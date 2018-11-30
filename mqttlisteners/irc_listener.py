@@ -74,7 +74,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
         if not door.getboolean('announce', True):
             return
 
-        elif name == 'Inspector Sands':
+        if name == 'Inspector Sands':
             msg = "%s reported to %s" % (fix_rtl(strip_string(name)), door['name'])
         else:
             msg = "%s opened %s" % (fix_rtl(strip_string(name)), door['name'])
@@ -100,7 +100,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
             if ago > datetime.timedelta(0, 3600):
                 summary = True
 
-        if name == 'Ragey':
+        if name == 'ragey':
             msg = "RAGEY SMASH PUNY DOOR, RAGEY RAGE ENTER HACKSPACE NOW"
 
         self.send_message(msg, summary)
