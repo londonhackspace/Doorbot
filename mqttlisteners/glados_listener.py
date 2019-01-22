@@ -24,7 +24,10 @@ class GladosListener(MQTTDoorbotListener):
             subprocess.call(self.getcmd(s))
     
     def tts(self, string):
-        os.system('echo "{0}" | festival --tts'.format(string))
+        if sys.platform == 'Darwin':
+            os.system('echo "{0}" | say'.format(string))
+        else:
+            os.system('echo "{0}" | festival --tts'.format(string))
 
     def on_card(self, card_id, name, door, gladosfile):
         if door.getboolean('announce', True):
@@ -38,7 +41,7 @@ class GladosListener(MQTTDoorbotListener):
                         os.chdir(g)
                     else:
                         # Let's try to text to speech it
-                        self.tts("Greetings %s" % (name))
+                        self.tts(door['name'] + " sends greetings to %s" % (name))
         else:
             print("Will not announce stuff at %s" % (door['name'],))
 
