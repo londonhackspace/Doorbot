@@ -2,12 +2,14 @@ from MQTTDoorbotListener import MQTTDoorbotListener
 import os, random, subprocess
 import logging
 import sys
+import time
 
 class GladosListener(MQTTDoorbotListener):
 
     def __init__(self):
         MQTTDoorbotListener.__init__(self)
         self.doors_of_interest = sys.argv[1].split(',')
+        self.t = None
         print ("Doors of interest: ")
         for door in self.doors_of_interest:
             print (".. " + door)
@@ -65,7 +67,15 @@ class GladosListener(MQTTDoorbotListener):
         print("Exit button pressed on %s" % (door['name'],))
         for a_door in self.doors_of_interest:
                 if (door['name'] == a_door):
-                    self.playSounds(["glados-wavefiles/fixed/you're_welcome.wav"])
+                    exit_sound_choice = ["you're_welcome.wav","airplane2_doors.mp3","h2g2_doors.mp3"]
+                    soundfile = ["glados-wavefiles/fixed/" + random.choice(exit_sound_choice)]
+                    print ("Would play "+soundfile[0])
+                    t_ = time.time()
+                    if self.t is None or t_ - self.t >= 20:
+                        self.playSounds(soundfile)
+                        self.t = time.time()
+                    else:
+                        print("Shh. Two exits in 20 seconds. Keeping Ragey happy")
 
     def on_denied(self, card_id, name, door):
         print("%s denied access with card %s at door %s" % (name, card_id, door['name']))
@@ -73,6 +83,8 @@ class GladosListener(MQTTDoorbotListener):
                 if (door['name'] == a_door):
                     self.playSounds(["glados-wavefiles/fixed/unexpected_item_in_bagging_area.mp3"])
 
+if (os.path.isdir("/opt/Doorbot/mqttlisteners")):
+    os.chdir('/opt/Doorbot/mqttlisteners')
 logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', level=logging.DEBUG)
 dbl = GladosListener()
 
