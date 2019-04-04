@@ -66,7 +66,7 @@ if exc:
     print etree.tostring(exc[0], method="text", encoding='utf-8', pretty_print=True)
     sys.exit(1)
 
-logout_a = logged_in.xpath('//a[@href="/logout.php"]')
+logout_a = logged_in.xpath('//a[@href="/logout"]')
 if not logout_a:
     print 'Could not log in'
     sys.exit(1)
