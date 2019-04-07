@@ -39,7 +39,7 @@ class OLAListener(MQTTDoorbotListener):
         else:
             print("door \"%s\" has no lights configured" % (door['name']))
 
-    def on_unknown_card(self, card_id, door):
+    def on_unknown_card(self, card_id, door, user):
         if 'deny_colour' in self.config['ola']:
             (r,g,b) = self.config['ola']['bell_colour'].split(",")
             self.set_colour(r,g,b)
