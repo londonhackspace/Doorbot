@@ -61,3 +61,4 @@ announce = false
 server = http://ola:9090
 length = 5
 bell_colour = 255,255,255
+deny_colour = 255,0,0
