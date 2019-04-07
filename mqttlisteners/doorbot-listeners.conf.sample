@@ -31,6 +31,7 @@ announce = true
 [1f-entrance]
 name = the Hackspace First Floor Door
 announce = true
+lights = 0,0,255
 
 [gf-front-inner]
 name = the Hackspace Workshops Door
@@ -55,3 +56,8 @@ announce = false
 [gf-backgate]
 name = the Back Gate
 announce = false
+
+[ola]
+server = http://ola:9090
+length = 5
+bell_colour = 255,255,255
