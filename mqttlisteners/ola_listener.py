@@ -41,7 +41,7 @@ class OLAListener(MQTTDoorbotListener):
 
     def on_unknown_card(self, card_id, door, user):
         if 'deny_colour' in self.config['ola']:
-            (r,g,b) = self.config['ola']['bell_colour'].split(",")
+            (r,g,b) = self.config['ola']['deny_colour'].split(",")
             self.set_colour(r,g,b)
 
     def on_start(self, door):
@@ -60,7 +60,7 @@ class OLAListener(MQTTDoorbotListener):
 
     def on_denied(self, card_id, name, door):
         if 'deny_colour' in self.config['ola']:
-            (r,g,b) = self.config['ola']['bell_colour'].split(",")
+            (r,g,b) = self.config['ola']['deny_colour'].split(",")
             self.set_colour(r,g,b)
 
 olal = OLAListener()
