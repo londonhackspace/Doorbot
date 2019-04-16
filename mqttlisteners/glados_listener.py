@@ -73,7 +73,7 @@ class GladosListener(MQTTDoorbotListener):
         print("Exit button pressed on %s" % (door['name'],))
         for a_door in self.doors_of_interest:
                 if (door['name'] == a_door):
-                    exit_sound_choice = ["you're_welcome.wav","airplane2_doors.mp3","h2g2_doors.mp3"]
+                    exit_sound_choice = ["you're_welcome.wav","airplane2_doors.mp3","h2g2_doors.mp3","tos-turboliftdoor.mp3"]
                     soundfile = ["glados-wavefiles/fixed/" + random.choice(exit_sound_choice)]
                     print ("Would play "+soundfile[0])
                     t_ = time.time()
