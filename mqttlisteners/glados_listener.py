@@ -48,8 +48,11 @@ class GladosListener(MQTTDoorbotListener):
             print("Will not announce stuff at %s" % (door['name'],))
 
     def on_unknown_card(self, card_id, door, user):
-        print("unknown card %s presented at door %s" % (card_id, door['name']))
-        self.playSounds(["glados-wavefiles/fixed/GlaDOS_intrusion_detected_Silent_alarm_.wav"])
+        if door.getboolean('announce', True):
+            for a_door in self.doors_of_interest:
+                if (door['name'] == a_door):
+                    print("unknown card %s presented at door %s" % (card_id, door['name']))
+                    self.playSounds(["glados-wavefiles/fixed/GlaDOS_intrusion_detected_Silent_alarm_.wav"])
 
     def on_start(self, door):
         print("%s started up" % (door['name'],))
@@ -61,7 +64,10 @@ class GladosListener(MQTTDoorbotListener):
         print("DING DONG! Door %s" % (door['name'],))
         for a_door in self.doors_of_interest:
                 if (door['name'] == a_door):
-                    self.playSounds(["glados-wavefiles/fixed/hackspacebingbong.wav"])
+                    if os.path.isfile("glados-wavefiles/fixed/" + a_door + ".mp3"):
+                        self.playSounds(["glados-wavefiles/fixed/" + a_door + ".mp3"])
+                    else:
+                        self.playSounds(["glados-wavefiles/fixed/hackspacebingbong.wav"])
 
     def on_exit(self, door):
         print("Exit button pressed on %s" % (door['name'],))
