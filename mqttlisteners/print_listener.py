@@ -2,13 +2,13 @@ from MQTTDoorbotListener import MQTTDoorbotListener
 
 class TestListener(MQTTDoorbotListener):
 
-    def on_card(self, card_id, name, door):
+    def on_card(self, card_id, name, door, gladosfile):
         if door.getboolean('announce', True):
             print("%s presented card %s at door %s" % (name, card_id, door['name']))
         else:
             print("Will not announce stuff at %s" % (door['name'],))
 
-    def on_unknown_card(self, card_id, door):
+    def on_unknown_card(self, card_id, door, user):
         print("unknown card %s presented at door %s" % (card_id, door['name']))
 
     def on_start(self, door):

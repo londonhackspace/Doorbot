@@ -1,4 +1,6 @@
-These scripts react to broadcast messages sent out by doorbots (UDP broadcast, back doorbot port 50001, front doorbot port 50002).
+These scripts reacted to broadcast messages sent out by doorbots (UDP broadcast, back doorbot port 50001, front doorbot port 50002).
+
+These are no longer in use, since at LHS we now use MQTT notifications instead. see the ../mqttlisteners/ directory
 
 Scripts running on hamming as of 14 September 2015:
 
