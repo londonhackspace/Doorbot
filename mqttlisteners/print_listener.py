@@ -9,7 +9,7 @@ class TestListener(MQTTDoorbotListener):
             print("Will not announce stuff at %s" % (door['name'],))
 
     def on_unknown_card(self, card_id, door, user):
-        print("unknown card %s presented at door %s" % (card_id, door['name']))
+        print("unknown card %s (user %s) presented at door %s" % (card_id, user, door['name']))
 
     def on_start(self, door):
         print("%s started up" % (door['name'],))
