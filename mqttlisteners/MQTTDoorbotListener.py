@@ -14,6 +14,10 @@ def on_mqtt_message(client, userdata, msg):
     except Exception as e:
         print("Error handing message \"%s\" from topic %s - %s" % (msg.payload, msg.topic, repr(e)))
 
+def on_mqtt_disconnect(client, userdata, rc):
+    print("Disconnected from server")
+    userdata._mqtt_disconnect(client, rc)
+
 class MQTTDoorbotListener():
 
     def __init__(self):
@@ -29,12 +33,16 @@ class MQTTDoorbotListener():
 
         self.mqtt_client = mqtt.Client(userdata=self)
         self.mqtt_client.on_connect = on_mqtt_connect
+        self.mqtt_client.on_disconnect = on_mqtt_disconnect
         self.mqtt_client.on_message = on_mqtt_message
 
     def _mqtt_connect(self, client, flags, rc):
         topic = self.config['default']['mqtt_topic']
         print("Connected to server. Subscribing to %s" % (topic,))
         self.mqtt_client.subscribe(topic)
+
+    def _mqtt_disconnect(self, client, rc):
+        pass
 
     def door_resolve(self, door):
         if door in self.config:
@@ -113,5 +121,4 @@ class MQTTDoorbotListener():
     def run(self):
         self.mqtt_client.connect(self.config['default']['mqtt_server'])
         print("Running MQTT loop")
-        while True:
-            self.mqtt_client.loop()
+        self.mqtt_client.loop_forever(retry_first_connection=True)
