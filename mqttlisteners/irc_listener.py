@@ -69,6 +69,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
         self.summary_topic = self.config['irc']['summary_topic']
         self.lastMessage = None
         self.dupeMessages = 0
+        self.lastTime = 0
 
     def on_card(self, card_id, name, door, gladosfile):
         if not door.getboolean('announce', True):
