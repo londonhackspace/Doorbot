@@ -130,6 +130,10 @@ class IRCDoorbotListener(MQTTDoorbotListener):
             dingdong = 'DING DONG, DOOR BELL!'
         self.send_message("%s: %s" % (door['name'], dingdong), True)
 
+    def on_exit(self, door, doorbellack):
+        if (doorbellack):
+            self.send_message("Doorbell at %s has been answered" % (door['name'],))
+
     def send_message(self, message, summary=False):
         # add the channel name to the start
         if summary:

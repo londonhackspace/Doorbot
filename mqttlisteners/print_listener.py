@@ -20,8 +20,10 @@ class TestListener(MQTTDoorbotListener):
     def on_bell(self, door):
         print("DING DONG! Door %s" % (door['name'],))
 
-    def on_exit(self, door):
+    def on_exit(self, door, doorbellack):
         print("Exit button pressed on %s" % (door['name'],))
+        if (doorbellack):
+            print("..in response to a recent doorbell")
 
     def on_denied(self, card_id, name, door):
         print("%s denied access with card %s at door %s" % (name, card_id, door['name']))

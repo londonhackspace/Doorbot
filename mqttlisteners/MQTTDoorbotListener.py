@@ -91,7 +91,10 @@ class MQTTDoorbotListener():
         elif payload['Type'] == "BELL":
             self.on_bell(door)
         elif payload['Type'] == "EXIT":
-            self.on_exit(door)
+            if (not('doorbellack' in payload.keys())):
+                # Not all doorbots include this yet
+                payload['doorbellack'] = False
+            self.on_exit(door, payload['doorbellack'])
         else:
             print("Unknown message type %s" % (payload['Type'],))
 
@@ -115,7 +118,7 @@ class MQTTDoorbotListener():
     def on_bell(self, door):
         pass
 
-    def on_exit(self, door):
+    def on_exit(self, door, doorbellack):
         pass
 
     def run(self):

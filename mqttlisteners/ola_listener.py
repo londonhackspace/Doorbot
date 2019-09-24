@@ -55,7 +55,7 @@ class OLAListener(MQTTDoorbotListener):
             (r,g,b) = self.config['ola']['bell_colour'].split(",")
             self.set_colour(r,g,b)
 
-    def on_exit(self, door):
+    def on_exit(self, door, doorbellack):
         pass
 
     def on_denied(self, card_id, name, door):
