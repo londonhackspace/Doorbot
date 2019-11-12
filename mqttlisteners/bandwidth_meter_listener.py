@@ -191,14 +191,14 @@ if __name__ == "__main__":
     if 'hostname' in args:
         host = args.hostname
     else:
-        host = 'boole'
+        host = 'norton'
 
 
     period = 5
     tperiod = period # target period
 
     # Ujima House, allegedly 300 / 300
-    ujimaiface = Speed(get_speeds_snmp, [host, 'em0'], 300.0, 300.0)
+    ujimaiface = Speed(get_speeds_snmp, [host, 'bge0.5'], 300.0, 300.0)
 
     ifaces = [["Ujima Net", ujimaiface, 0],]
 
