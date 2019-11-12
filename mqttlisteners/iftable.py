@@ -40,7 +40,7 @@ def get_speeds_snmp(host, ifname = 'ppp0', community = 'public'):
         return (None, None)
     inoct = outoct = None
     for idx in list(table.keys()):
-        if table[idx]['ifType'] == 'ethernetCsmacd' or table[idx]['ifType'] == 'ppp':
+        if table[idx]['ifType'] == 'ethernetCsmacd' or table[idx]['ifType'] == 'ppp' or table[idx]['ifType'] == 'l2vlan':
             if table[idx]['ifDescr'] == ifname:
                 inoct = int(table[idx]['ifInOctets'])
                 outoct = int(table[idx]['ifOutOctets'])
