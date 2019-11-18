@@ -53,6 +53,10 @@ announce = false
 name = the Biolab Door
 announce = false
 
+[gf-toolstore]
+name = the Toolstore Door
+announce = false
+
 [gf-backgate]
 name = the Back Gate
 announce = false
