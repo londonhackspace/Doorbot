@@ -20,7 +20,7 @@ class GladosListener(MQTTDoorbotListener):
     def getcmd(self,sound):
         # Prerequisites for this command:
         # sudo apt-get install sox libsox-fmt-mp3
-        return ['play', '-q', '--norm', str(sound), 'trim', '0', '00:17']
+        return ['play', '-q', str(sound), 'trim', '0', '00:17']
 
     def playSounds(self, sounds):
         print (sounds)
@@ -32,7 +32,7 @@ class GladosListener(MQTTDoorbotListener):
         if sys.platform == 'Darwin':
             os.system('echo "{0}" | say'.format(string))
         else:
-            os.system('echo "{0}" | festival --tts'.format(string))
+            os.system('echo "{0}" | gtts-cli -l sv - | play -t mp3 -'.format(string))
 
     def on_card(self, card_id, name, door, gladosfile):
         if door.getboolean('announce', True):
