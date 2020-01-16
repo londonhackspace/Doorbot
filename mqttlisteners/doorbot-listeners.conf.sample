@@ -28,11 +28,6 @@ picklefile = lastseen.pickle
 name = the Hackspace Back Door
 announce = true
 
-[1f-entrance]
-name = the Hackspace First Floor Door
-announce = true
-lights = 0,0,255
-
 [gf-front-inner]
 name = the Hackspace Workshops Door
 announce = true
@@ -42,15 +37,19 @@ name = the Building's Front Door
 announce = true
 
 [1f-electronics-lab]
-name = the Electronics Lab Door
+name = the former Hackspace 1st Floor Door
 announce = false
 
-[1f-funk]
+[gf-funk]
 name = the Radio Lair Door
 announce = false
 
 [gf-biolab]
 name = the Biolab Door
+announce = false
+
+[gf-toolstore]
+name = the Toolstore Door
 announce = false
 
 [gf-backgate]
