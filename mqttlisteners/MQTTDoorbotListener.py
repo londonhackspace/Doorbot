@@ -89,7 +89,10 @@ class MQTTDoorbotListener():
         elif payload['Type'] == "ALIVE":
             self.on_alive(door)
         elif payload['Type'] == "BELL":
-            self.on_bell(door)
+            if not door.getboolean('bell_inhibit', False):
+                self.on_bell(door)
+            else:
+                print("Inhibiting bell for %s" % (door['name'],))
         elif payload['Type'] == "EXIT":
             if (not('doorbellack' in payload.keys())):
                 # Not all doorbots include this yet
