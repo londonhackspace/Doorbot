@@ -32,7 +32,7 @@ class GladosListener(MQTTDoorbotListener):
         if sys.platform == 'Darwin':
             os.system('echo "{0}" | say'.format(string))
         else:
-            os.system('echo "{0}" | gtts-cli -l sv - | play -t mp3 -'.format(string))
+            os.system('echo "{0}" | gtts-cli -l en-au - | play -t mp3 -'.format(string))
 
     def on_card(self, card_id, name, door, gladosfile):
         if door.getboolean('announce', True):
