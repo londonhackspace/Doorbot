@@ -163,7 +163,7 @@ class IRCDoorbotListener(MQTTDoorbotListener):
             server = self.config.get('irc', 'irccat')
             port = self.config.getint('irc', 'irccat_port')
             s.connect((server, port))
-            s.send(message.encode('utf-8'))
+            s.send((message+"\n").encode('utf-8'))
             s.close()
         except Exception as e:
             print('Exception in main loop: %s' % repr(e))
