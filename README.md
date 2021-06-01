@@ -1,5 +1,7 @@
-This repo is just audio announcers
-==================================
+This repo is just announcers
+============================
+
+Audio announcers live here, as do IRC announcers, and (currently defunct) lighting accouncers. They listen for MQTT messages and perform actions based on them.
 
 see also https://github.com/londonhackspace/acnode-cl for the Connected Launchpad hardware build and firmware
 and https://github.com/londonhackspace/acserver-django for the authentication and management back-end.
