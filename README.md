@@ -1,3 +1,9 @@
+This repo is just audio announcers
+==================================
+
+see also https://github.com/londonhackspace/acnode-cl for the Connected Launchpad hardware build and firmware
+and https://github.com/londonhackspace/acserver-django for the authentication and management back-end.
+
 Prerequisites
 =============
 
